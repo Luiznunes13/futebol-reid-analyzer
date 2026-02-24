@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classificador de Jogadores</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .header h1 { margin-bottom: 10px; }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+        }
+        .stat {
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+        .stat-number { font-size: 24px; font-weight: bold; }
+        .jogadores-list {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .jogador-btn {
+            padding: 8px 15px;
+            background: #667eea;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .jogador-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: #2a2a2a;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .card.classificado { border-color: #4CAF50; }
+        .card-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .card-info {
+            padding: 15px;
+        }
+        .card-id {
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .card-input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #444;
+            border-radius: 5px;
+            background: #1a1a1a;
+            color: white;
+            font-size: 14px;
+        }
+        .card-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .card-nome {
+            background: #4CAF50;
+            color: white;
+            padding: 8px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .limpar-btn {
+            margin-top: 5px;
+            width: 100%;
+            padding: 5px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .limpar-btn:hover { background: #d32f2f; }
+        
+        /* Modal para ver imagem maior */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            margin-top: 2%;
+        }
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .filter-bar {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 8px 15px;
+            background: #444;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+        .filter-btn.active { background: #667eea; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚽ Classificador de Jogadores - Terça Nobre</h1>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number" id="total-ids">{{ total }}</div>
+                <div>Total de IDs</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="classificados">{{ classificados }}</div>
+                <div>Classificados</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="restantes">{{ total - classificados }}</div>
+                <div>Restantes</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="jogadores-list">
+        <strong style="width: 100%; text-align: center; margin-bottom: 10px;">Clique rápido:</strong>
+        {% for jogador in jogadores %}
+        <button class="jogador-btn" onclick="selecionarJogador('{{ jogador }}')">{{ jogador }}</button>
+        {% endfor %}
+    </div>
+
+    <div class="filter-bar">
+        <strong>Filtros:</strong>
+        <button class="filter-btn active" onclick="filtrar('todos')">Todos</button>
+        <button class="filter-btn" onclick="filtrar('pendentes')">Pendentes</button>
+        <button class="filter-btn" onclick="filtrar('classificados')">Classificados</button>
+    </div>
+
+    <div class="grid" id="grid">
+        {% for item in ids_data %}
+        <div class="card {{ 'classificado' if item.nome else '' }}" data-id="{{ item.id }}" data-status="{{ 'classificado' if item.nome else 'pendente' }}">
+            <img src="/jogadores_terca/{{ item.imgs[0] }}" class="card-img" onclick="verImagem(this.src)" alt="ID {{ item.id }}">
+            <div class="card-info">
+                <div class="card-id">ID: {{ item.id }}</div>
+                {% if item.nome %}
+                <div class="card-nome" onclick="editarNome('{{ item.id }}')">{{ item.nome }}</div>
+                <button class="limpar-btn" onclick="limparNome('{{ item.id }}')">Limpar</button>
+                {% else %}
+                <input type="text" class="card-input" id="input-{{ item.id }}" placeholder="Nome do jogador" 
+                       onchange="salvarNome('{{ item.id }}', this.value)">
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Modal para imagem ampliada -->
+    <div id="modal" class="modal" onclick="fecharModal()">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modal-img">
+    </div>
+
+    <script>
+        let idSelecionado = null;
+
+        function selecionarJogador(nome) {
+            if (!idSelecionado) {
+                // Se não tem ID selecionado, seleciona o próximo pendente
+                const pendentes = document.querySelectorAll('.card:not(.classificado)');
+                if (pendentes.length > 0) {
+                    idSelecionado = pendentes[0].dataset.id;
+                }
+            }
+            
+            if (idSelecionado) {
+                salvarNome(idSelecionado, nome);
+                idSelecionado = null;
+            }
+        }
+
+        function salvarNome(id, nome) {
+            if (!nome) return;
+            
+            fetch('/salvar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id, nome: nome })
+            })
+            .then(r => r.json())
+            .then(data => {
+                location.reload(); // Recarrega para atualizar
+            });
+        }
+
+        function limparNome(id) {
+            fetch('/salvar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id, nome: '' })
+            })
+            .then(r => r.json())
+            .then(data => {
+                location.reload();
+            });
+        }
+
+        function editarNome(id) {
+            limparNome(id);
+        }
+
+        function verImagem(src) {
+            document.getElementById('modal-img').src = src;
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        function fecharModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function filtrar(tipo) {
+            const cards = document.querySelectorAll('.card');
+            const btns = document.querySelectorAll('.filter-btn');
+            
+            btns.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            cards.forEach(card => {
+                if (tipo === 'todos') {
+                    card.style.display = 'block';
+                } else if (tipo === 'pendentes' && card.dataset.status === 'pendente') {
+                    card.style.display = 'block';
+                } else if (tipo === 'classificados' && card.dataset.status === 'classificado') {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Atalho: pressionar número seleciona jogador
+        document.addEventListener('keypress', (e) => {
+            const num = parseInt(e.key);
+            if (num >= 1 && num <= {{ jogadores|length }}) {
+                selecionarJogador('{{ jogadores[0] }}'.split(',')[num-1]);
+            }
+        });
+    </script>
+</body>
+</html>

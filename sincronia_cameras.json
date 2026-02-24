@@ -1,0 +1,1237 @@
+{
+    "ESQ_10358_DIR_12319": {
+        "id_esq": "10358",
+        "id_dir": "12319",
+        "jogador": "Ageu"
+    },
+    "ESQ_10358_DIR_12385": {
+        "id_esq": "10358",
+        "id_dir": "12385",
+        "jogador": "Ageu"
+    },
+    "ESQ_12741_DIR_12319": {
+        "id_esq": "12741",
+        "id_dir": "12319",
+        "jogador": "Ageu"
+    },
+    "ESQ_12741_DIR_12385": {
+        "id_esq": "12741",
+        "id_dir": "12385",
+        "jogador": "Ageu"
+    },
+    "ESQ_15913_DIR_12319": {
+        "id_esq": "15913",
+        "id_dir": "12319",
+        "jogador": "Ageu"
+    },
+    "ESQ_15913_DIR_12385": {
+        "id_esq": "15913",
+        "id_dir": "12385",
+        "jogador": "Ageu"
+    },
+    "ESQ_9050_DIR_10982": {
+        "id_esq": "9050",
+        "id_dir": "10982",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_9050_DIR_19177": {
+        "id_esq": "9050",
+        "id_dir": "19177",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_9050_DIR_1": {
+        "id_esq": "9050",
+        "id_dir": "1",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_9050_DIR_135": {
+        "id_esq": "9050",
+        "id_dir": "135",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_9050_DIR_352": {
+        "id_esq": "9050",
+        "id_dir": "352",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_9050_DIR_389": {
+        "id_esq": "9050",
+        "id_dir": "389",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_17370_DIR_10982": {
+        "id_esq": "17370",
+        "id_dir": "10982",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_17370_DIR_19177": {
+        "id_esq": "17370",
+        "id_dir": "19177",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_17370_DIR_1": {
+        "id_esq": "17370",
+        "id_dir": "1",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_17370_DIR_135": {
+        "id_esq": "17370",
+        "id_dir": "135",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_17370_DIR_352": {
+        "id_esq": "17370",
+        "id_dir": "352",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_17370_DIR_389": {
+        "id_esq": "17370",
+        "id_dir": "389",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_1_DIR_10982": {
+        "id_esq": "1",
+        "id_dir": "10982",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_1_DIR_19177": {
+        "id_esq": "1",
+        "id_dir": "19177",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_1_DIR_1": {
+        "id_esq": "1",
+        "id_dir": "1",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_1_DIR_135": {
+        "id_esq": "1",
+        "id_dir": "135",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_1_DIR_352": {
+        "id_esq": "1",
+        "id_dir": "352",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_1_DIR_389": {
+        "id_esq": "1",
+        "id_dir": "389",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_352_DIR_10982": {
+        "id_esq": "352",
+        "id_dir": "10982",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_352_DIR_19177": {
+        "id_esq": "352",
+        "id_dir": "19177",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_352_DIR_1": {
+        "id_esq": "352",
+        "id_dir": "1",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_352_DIR_135": {
+        "id_esq": "352",
+        "id_dir": "135",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_352_DIR_352": {
+        "id_esq": "352",
+        "id_dir": "352",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_352_DIR_389": {
+        "id_esq": "352",
+        "id_dir": "389",
+        "jogador": "Alexandrino"
+    },
+    "ESQ_3_DIR_3": {
+        "id_esq": "3",
+        "id_dir": "3",
+        "jogador": "André"
+    },
+    "ESQ_3_DIR_20": {
+        "id_esq": "3",
+        "id_dir": "20",
+        "jogador": "André"
+    },
+    "ESQ_3_DIR_50": {
+        "id_esq": "3",
+        "id_dir": "50",
+        "jogador": "André"
+    },
+    "ESQ_3_DIR_263": {
+        "id_esq": "3",
+        "id_dir": "263",
+        "jogador": "André"
+    },
+    "ESQ_3_DIR_381": {
+        "id_esq": "3",
+        "id_dir": "381",
+        "jogador": "André"
+    },
+    "ESQ_3_DIR_384": {
+        "id_esq": "3",
+        "id_dir": "384",
+        "jogador": "André"
+    },
+    "ESQ_3_DIR_402": {
+        "id_esq": "3",
+        "id_dir": "402",
+        "jogador": "André"
+    },
+    "ESQ_3_DIR_418": {
+        "id_esq": "3",
+        "id_dir": "418",
+        "jogador": "André"
+    },
+    "ESQ_418_DIR_3": {
+        "id_esq": "418",
+        "id_dir": "3",
+        "jogador": "André"
+    },
+    "ESQ_418_DIR_20": {
+        "id_esq": "418",
+        "id_dir": "20",
+        "jogador": "André"
+    },
+    "ESQ_418_DIR_50": {
+        "id_esq": "418",
+        "id_dir": "50",
+        "jogador": "André"
+    },
+    "ESQ_418_DIR_263": {
+        "id_esq": "418",
+        "id_dir": "263",
+        "jogador": "André"
+    },
+    "ESQ_418_DIR_381": {
+        "id_esq": "418",
+        "id_dir": "381",
+        "jogador": "André"
+    },
+    "ESQ_418_DIR_384": {
+        "id_esq": "418",
+        "id_dir": "384",
+        "jogador": "André"
+    },
+    "ESQ_418_DIR_402": {
+        "id_esq": "418",
+        "id_dir": "402",
+        "jogador": "André"
+    },
+    "ESQ_418_DIR_418": {
+        "id_esq": "418",
+        "id_dir": "418",
+        "jogador": "André"
+    },
+    "ESQ_2527_DIR_10984": {
+        "id_esq": "2527",
+        "id_dir": "10984",
+        "jogador": "Caíque"
+    },
+    "ESQ_3439_DIR_10984": {
+        "id_esq": "3439",
+        "id_dir": "10984",
+        "jogador": "Caíque"
+    },
+    "ESQ_7276_DIR_10984": {
+        "id_esq": "7276",
+        "id_dir": "10984",
+        "jogador": "Caíque"
+    },
+    "ESQ_7622_DIR_10984": {
+        "id_esq": "7622",
+        "id_dir": "10984",
+        "jogador": "Caíque"
+    },
+    "ESQ_10161_DIR_10984": {
+        "id_esq": "10161",
+        "id_dir": "10984",
+        "jogador": "Caíque"
+    },
+    "ESQ_117_DIR_10984": {
+        "id_esq": "117",
+        "id_dir": "10984",
+        "jogador": "Caíque"
+    },
+    "ESQ_7552_DIR_4": {
+        "id_esq": "7552",
+        "id_dir": "4",
+        "jogador": "Gustavo"
+    },
+    "ESQ_7552_DIR_21": {
+        "id_esq": "7552",
+        "id_dir": "21",
+        "jogador": "Gustavo"
+    },
+    "ESQ_7552_DIR_26": {
+        "id_esq": "7552",
+        "id_dir": "26",
+        "jogador": "Gustavo"
+    },
+    "ESQ_7635_DIR_4": {
+        "id_esq": "7635",
+        "id_dir": "4",
+        "jogador": "Gustavo"
+    },
+    "ESQ_7635_DIR_21": {
+        "id_esq": "7635",
+        "id_dir": "21",
+        "jogador": "Gustavo"
+    },
+    "ESQ_7635_DIR_26": {
+        "id_esq": "7635",
+        "id_dir": "26",
+        "jogador": "Gustavo"
+    },
+    "ESQ_7842_DIR_4": {
+        "id_esq": "7842",
+        "id_dir": "4",
+        "jogador": "Gustavo"
+    },
+    "ESQ_7842_DIR_21": {
+        "id_esq": "7842",
+        "id_dir": "21",
+        "jogador": "Gustavo"
+    },
+    "ESQ_7842_DIR_26": {
+        "id_esq": "7842",
+        "id_dir": "26",
+        "jogador": "Gustavo"
+    },
+    "ESQ_10448_DIR_4": {
+        "id_esq": "10448",
+        "id_dir": "4",
+        "jogador": "Gustavo"
+    },
+    "ESQ_10448_DIR_21": {
+        "id_esq": "10448",
+        "id_dir": "21",
+        "jogador": "Gustavo"
+    },
+    "ESQ_10448_DIR_26": {
+        "id_esq": "10448",
+        "id_dir": "26",
+        "jogador": "Gustavo"
+    },
+    "ESQ_16152_DIR_4": {
+        "id_esq": "16152",
+        "id_dir": "4",
+        "jogador": "Gustavo"
+    },
+    "ESQ_16152_DIR_21": {
+        "id_esq": "16152",
+        "id_dir": "21",
+        "jogador": "Gustavo"
+    },
+    "ESQ_16152_DIR_26": {
+        "id_esq": "16152",
+        "id_dir": "26",
+        "jogador": "Gustavo"
+    },
+    "ESQ_4_DIR_4": {
+        "id_esq": "4",
+        "id_dir": "4",
+        "jogador": "Gustavo"
+    },
+    "ESQ_4_DIR_21": {
+        "id_esq": "4",
+        "id_dir": "21",
+        "jogador": "Gustavo"
+    },
+    "ESQ_4_DIR_26": {
+        "id_esq": "4",
+        "id_dir": "26",
+        "jogador": "Gustavo"
+    },
+    "ESQ_10798_DIR_2": {
+        "id_esq": "10798",
+        "id_dir": "2",
+        "jogador": "João Pedro"
+    },
+    "ESQ_10798_DIR_58": {
+        "id_esq": "10798",
+        "id_dir": "58",
+        "jogador": "João Pedro"
+    },
+    "ESQ_10798_DIR_395": {
+        "id_esq": "10798",
+        "id_dir": "395",
+        "jogador": "João Pedro"
+    },
+    "ESQ_11858_DIR_2": {
+        "id_esq": "11858",
+        "id_dir": "2",
+        "jogador": "João Pedro"
+    },
+    "ESQ_11858_DIR_58": {
+        "id_esq": "11858",
+        "id_dir": "58",
+        "jogador": "João Pedro"
+    },
+    "ESQ_11858_DIR_395": {
+        "id_esq": "11858",
+        "id_dir": "395",
+        "jogador": "João Pedro"
+    },
+    "ESQ_11922_DIR_2": {
+        "id_esq": "11922",
+        "id_dir": "2",
+        "jogador": "João Pedro"
+    },
+    "ESQ_11922_DIR_58": {
+        "id_esq": "11922",
+        "id_dir": "58",
+        "jogador": "João Pedro"
+    },
+    "ESQ_11922_DIR_395": {
+        "id_esq": "11922",
+        "id_dir": "395",
+        "jogador": "João Pedro"
+    },
+    "ESQ_12567_DIR_2": {
+        "id_esq": "12567",
+        "id_dir": "2",
+        "jogador": "João Pedro"
+    },
+    "ESQ_12567_DIR_58": {
+        "id_esq": "12567",
+        "id_dir": "58",
+        "jogador": "João Pedro"
+    },
+    "ESQ_12567_DIR_395": {
+        "id_esq": "12567",
+        "id_dir": "395",
+        "jogador": "João Pedro"
+    },
+    "ESQ_13689_DIR_2": {
+        "id_esq": "13689",
+        "id_dir": "2",
+        "jogador": "João Pedro"
+    },
+    "ESQ_13689_DIR_58": {
+        "id_esq": "13689",
+        "id_dir": "58",
+        "jogador": "João Pedro"
+    },
+    "ESQ_13689_DIR_395": {
+        "id_esq": "13689",
+        "id_dir": "395",
+        "jogador": "João Pedro"
+    },
+    "ESQ_2_DIR_2": {
+        "id_esq": "2",
+        "id_dir": "2",
+        "jogador": "João Pedro"
+    },
+    "ESQ_2_DIR_58": {
+        "id_esq": "2",
+        "id_dir": "58",
+        "jogador": "João Pedro"
+    },
+    "ESQ_2_DIR_395": {
+        "id_esq": "2",
+        "id_dir": "395",
+        "jogador": "João Pedro"
+    },
+    "ESQ_9_DIR_9": {
+        "id_esq": "9",
+        "id_dir": "9",
+        "jogador": "Julio"
+    },
+    "ESQ_9_DIR_137": {
+        "id_esq": "9",
+        "id_dir": "137",
+        "jogador": "Julio"
+    },
+    "ESQ_9_DIR_148": {
+        "id_esq": "9",
+        "id_dir": "148",
+        "jogador": "Julio"
+    },
+    "ESQ_9_DIR_412": {
+        "id_esq": "9",
+        "id_dir": "412",
+        "jogador": "Julio"
+    },
+    "ESQ_137_DIR_9": {
+        "id_esq": "137",
+        "id_dir": "9",
+        "jogador": "Julio"
+    },
+    "ESQ_137_DIR_137": {
+        "id_esq": "137",
+        "id_dir": "137",
+        "jogador": "Julio"
+    },
+    "ESQ_137_DIR_148": {
+        "id_esq": "137",
+        "id_dir": "148",
+        "jogador": "Julio"
+    },
+    "ESQ_137_DIR_412": {
+        "id_esq": "137",
+        "id_dir": "412",
+        "jogador": "Julio"
+    },
+    "ESQ_148_DIR_9": {
+        "id_esq": "148",
+        "id_dir": "9",
+        "jogador": "Julio"
+    },
+    "ESQ_148_DIR_137": {
+        "id_esq": "148",
+        "id_dir": "137",
+        "jogador": "Julio"
+    },
+    "ESQ_148_DIR_148": {
+        "id_esq": "148",
+        "id_dir": "148",
+        "jogador": "Julio"
+    },
+    "ESQ_148_DIR_412": {
+        "id_esq": "148",
+        "id_dir": "412",
+        "jogador": "Julio"
+    },
+    "ESQ_248_DIR_9": {
+        "id_esq": "248",
+        "id_dir": "9",
+        "jogador": "Julio"
+    },
+    "ESQ_248_DIR_137": {
+        "id_esq": "248",
+        "id_dir": "137",
+        "jogador": "Julio"
+    },
+    "ESQ_248_DIR_148": {
+        "id_esq": "248",
+        "id_dir": "148",
+        "jogador": "Julio"
+    },
+    "ESQ_248_DIR_412": {
+        "id_esq": "248",
+        "id_dir": "412",
+        "jogador": "Julio"
+    },
+    "ESQ_355_DIR_9": {
+        "id_esq": "355",
+        "id_dir": "9",
+        "jogador": "Julio"
+    },
+    "ESQ_355_DIR_137": {
+        "id_esq": "355",
+        "id_dir": "137",
+        "jogador": "Julio"
+    },
+    "ESQ_355_DIR_148": {
+        "id_esq": "355",
+        "id_dir": "148",
+        "jogador": "Julio"
+    },
+    "ESQ_355_DIR_412": {
+        "id_esq": "355",
+        "id_dir": "412",
+        "jogador": "Julio"
+    },
+    "ESQ_412_DIR_9": {
+        "id_esq": "412",
+        "id_dir": "9",
+        "jogador": "Julio"
+    },
+    "ESQ_412_DIR_137": {
+        "id_esq": "412",
+        "id_dir": "137",
+        "jogador": "Julio"
+    },
+    "ESQ_412_DIR_148": {
+        "id_esq": "412",
+        "id_dir": "148",
+        "jogador": "Julio"
+    },
+    "ESQ_412_DIR_412": {
+        "id_esq": "412",
+        "id_dir": "412",
+        "jogador": "Julio"
+    },
+    "ESQ_1372_DIR_1372": {
+        "id_esq": "1372",
+        "id_dir": "1372",
+        "jogador": "Juninho"
+    },
+    "ESQ_1372_DIR_15624": {
+        "id_esq": "1372",
+        "id_dir": "15624",
+        "jogador": "Juninho"
+    },
+    "ESQ_1372_DIR_7": {
+        "id_esq": "1372",
+        "id_dir": "7",
+        "jogador": "Juninho"
+    },
+    "ESQ_1372_DIR_27": {
+        "id_esq": "1372",
+        "id_dir": "27",
+        "jogador": "Juninho"
+    },
+    "ESQ_1372_DIR_235": {
+        "id_esq": "1372",
+        "id_dir": "235",
+        "jogador": "Juninho"
+    },
+    "ESQ_2828_DIR_1372": {
+        "id_esq": "2828",
+        "id_dir": "1372",
+        "jogador": "Juninho"
+    },
+    "ESQ_2828_DIR_15624": {
+        "id_esq": "2828",
+        "id_dir": "15624",
+        "jogador": "Juninho"
+    },
+    "ESQ_2828_DIR_7": {
+        "id_esq": "2828",
+        "id_dir": "7",
+        "jogador": "Juninho"
+    },
+    "ESQ_2828_DIR_27": {
+        "id_esq": "2828",
+        "id_dir": "27",
+        "jogador": "Juninho"
+    },
+    "ESQ_2828_DIR_235": {
+        "id_esq": "2828",
+        "id_dir": "235",
+        "jogador": "Juninho"
+    },
+    "ESQ_9474_DIR_1372": {
+        "id_esq": "9474",
+        "id_dir": "1372",
+        "jogador": "Juninho"
+    },
+    "ESQ_9474_DIR_15624": {
+        "id_esq": "9474",
+        "id_dir": "15624",
+        "jogador": "Juninho"
+    },
+    "ESQ_9474_DIR_7": {
+        "id_esq": "9474",
+        "id_dir": "7",
+        "jogador": "Juninho"
+    },
+    "ESQ_9474_DIR_27": {
+        "id_esq": "9474",
+        "id_dir": "27",
+        "jogador": "Juninho"
+    },
+    "ESQ_9474_DIR_235": {
+        "id_esq": "9474",
+        "id_dir": "235",
+        "jogador": "Juninho"
+    },
+    "ESQ_10_DIR_1372": {
+        "id_esq": "10",
+        "id_dir": "1372",
+        "jogador": "Juninho"
+    },
+    "ESQ_10_DIR_15624": {
+        "id_esq": "10",
+        "id_dir": "15624",
+        "jogador": "Juninho"
+    },
+    "ESQ_10_DIR_7": {
+        "id_esq": "10",
+        "id_dir": "7",
+        "jogador": "Juninho"
+    },
+    "ESQ_10_DIR_27": {
+        "id_esq": "10",
+        "id_dir": "27",
+        "jogador": "Juninho"
+    },
+    "ESQ_10_DIR_235": {
+        "id_esq": "10",
+        "id_dir": "235",
+        "jogador": "Juninho"
+    },
+    "ESQ_2466_DIR_90": {
+        "id_esq": "2466",
+        "id_dir": "90",
+        "jogador": "Neto"
+    },
+    "ESQ_2631_DIR_90": {
+        "id_esq": "2631",
+        "id_dir": "90",
+        "jogador": "Neto"
+    },
+    "ESQ_2730_DIR_90": {
+        "id_esq": "2730",
+        "id_dir": "90",
+        "jogador": "Neto"
+    },
+    "ESQ_7983_DIR_90": {
+        "id_esq": "7983",
+        "id_dir": "90",
+        "jogador": "Neto"
+    },
+    "ESQ_14624_DIR_90": {
+        "id_esq": "14624",
+        "id_dir": "90",
+        "jogador": "Neto"
+    },
+    "ESQ_217_DIR_90": {
+        "id_esq": "217",
+        "id_dir": "90",
+        "jogador": "Neto"
+    },
+    "ESQ_369_DIR_90": {
+        "id_esq": "369",
+        "id_dir": "90",
+        "jogador": "Neto"
+    },
+    "ESQ_379_DIR_14871": {
+        "id_esq": "379",
+        "id_dir": "14871",
+        "jogador": "Picoya"
+    },
+    "ESQ_379_DIR_19": {
+        "id_esq": "379",
+        "id_dir": "19",
+        "jogador": "Picoya"
+    },
+    "ESQ_379_DIR_138": {
+        "id_esq": "379",
+        "id_dir": "138",
+        "jogador": "Picoya"
+    },
+    "ESQ_379_DIR_391": {
+        "id_esq": "379",
+        "id_dir": "391",
+        "jogador": "Picoya"
+    },
+    "ESQ_4529_DIR_14871": {
+        "id_esq": "4529",
+        "id_dir": "14871",
+        "jogador": "Picoya"
+    },
+    "ESQ_4529_DIR_19": {
+        "id_esq": "4529",
+        "id_dir": "19",
+        "jogador": "Picoya"
+    },
+    "ESQ_4529_DIR_138": {
+        "id_esq": "4529",
+        "id_dir": "138",
+        "jogador": "Picoya"
+    },
+    "ESQ_4529_DIR_391": {
+        "id_esq": "4529",
+        "id_dir": "391",
+        "jogador": "Picoya"
+    },
+    "ESQ_275_DIR_14871": {
+        "id_esq": "275",
+        "id_dir": "14871",
+        "jogador": "Picoya"
+    },
+    "ESQ_275_DIR_19": {
+        "id_esq": "275",
+        "id_dir": "19",
+        "jogador": "Picoya"
+    },
+    "ESQ_275_DIR_138": {
+        "id_esq": "275",
+        "id_dir": "138",
+        "jogador": "Picoya"
+    },
+    "ESQ_275_DIR_391": {
+        "id_esq": "275",
+        "id_dir": "391",
+        "jogador": "Picoya"
+    },
+    "ESQ_394_DIR_14871": {
+        "id_esq": "394",
+        "id_dir": "14871",
+        "jogador": "Picoya"
+    },
+    "ESQ_394_DIR_19": {
+        "id_esq": "394",
+        "id_dir": "19",
+        "jogador": "Picoya"
+    },
+    "ESQ_394_DIR_138": {
+        "id_esq": "394",
+        "id_dir": "138",
+        "jogador": "Picoya"
+    },
+    "ESQ_394_DIR_391": {
+        "id_esq": "394",
+        "id_dir": "391",
+        "jogador": "Picoya"
+    },
+    "ESQ_469_DIR_15356": {
+        "id_esq": "469",
+        "id_dir": "15356",
+        "jogador": "Rafael"
+    },
+    "ESQ_469_DIR_15413": {
+        "id_esq": "469",
+        "id_dir": "15413",
+        "jogador": "Rafael"
+    },
+    "ESQ_469_DIR_52": {
+        "id_esq": "469",
+        "id_dir": "52",
+        "jogador": "Rafael"
+    },
+    "ESQ_469_DIR_88": {
+        "id_esq": "469",
+        "id_dir": "88",
+        "jogador": "Rafael"
+    },
+    "ESQ_469_DIR_280": {
+        "id_esq": "469",
+        "id_dir": "280",
+        "jogador": "Rafael"
+    },
+    "ESQ_13046_DIR_15356": {
+        "id_esq": "13046",
+        "id_dir": "15356",
+        "jogador": "Rafael"
+    },
+    "ESQ_13046_DIR_15413": {
+        "id_esq": "13046",
+        "id_dir": "15413",
+        "jogador": "Rafael"
+    },
+    "ESQ_13046_DIR_52": {
+        "id_esq": "13046",
+        "id_dir": "52",
+        "jogador": "Rafael"
+    },
+    "ESQ_13046_DIR_88": {
+        "id_esq": "13046",
+        "id_dir": "88",
+        "jogador": "Rafael"
+    },
+    "ESQ_13046_DIR_280": {
+        "id_esq": "13046",
+        "id_dir": "280",
+        "jogador": "Rafael"
+    },
+    "ESQ_13059_DIR_15356": {
+        "id_esq": "13059",
+        "id_dir": "15356",
+        "jogador": "Rafael"
+    },
+    "ESQ_13059_DIR_15413": {
+        "id_esq": "13059",
+        "id_dir": "15413",
+        "jogador": "Rafael"
+    },
+    "ESQ_13059_DIR_52": {
+        "id_esq": "13059",
+        "id_dir": "52",
+        "jogador": "Rafael"
+    },
+    "ESQ_13059_DIR_88": {
+        "id_esq": "13059",
+        "id_dir": "88",
+        "jogador": "Rafael"
+    },
+    "ESQ_13059_DIR_280": {
+        "id_esq": "13059",
+        "id_dir": "280",
+        "jogador": "Rafael"
+    },
+    "ESQ_52_DIR_15356": {
+        "id_esq": "52",
+        "id_dir": "15356",
+        "jogador": "Rafael"
+    },
+    "ESQ_52_DIR_15413": {
+        "id_esq": "52",
+        "id_dir": "15413",
+        "jogador": "Rafael"
+    },
+    "ESQ_52_DIR_52": {
+        "id_esq": "52",
+        "id_dir": "52",
+        "jogador": "Rafael"
+    },
+    "ESQ_52_DIR_88": {
+        "id_esq": "52",
+        "id_dir": "88",
+        "jogador": "Rafael"
+    },
+    "ESQ_52_DIR_280": {
+        "id_esq": "52",
+        "id_dir": "280",
+        "jogador": "Rafael"
+    },
+    "ESQ_88_DIR_15356": {
+        "id_esq": "88",
+        "id_dir": "15356",
+        "jogador": "Rafael"
+    },
+    "ESQ_88_DIR_15413": {
+        "id_esq": "88",
+        "id_dir": "15413",
+        "jogador": "Rafael"
+    },
+    "ESQ_88_DIR_52": {
+        "id_esq": "88",
+        "id_dir": "52",
+        "jogador": "Rafael"
+    },
+    "ESQ_88_DIR_88": {
+        "id_esq": "88",
+        "id_dir": "88",
+        "jogador": "Rafael"
+    },
+    "ESQ_88_DIR_280": {
+        "id_esq": "88",
+        "id_dir": "280",
+        "jogador": "Rafael"
+    },
+    "ESQ_8802_DIR_12804": {
+        "id_esq": "8802",
+        "id_dir": "12804",
+        "jogador": "Sérgio"
+    },
+    "ESQ_8930_DIR_12804": {
+        "id_esq": "8930",
+        "id_dir": "12804",
+        "jogador": "Sérgio"
+    },
+    "ESQ_8990_DIR_12804": {
+        "id_esq": "8990",
+        "id_dir": "12804",
+        "jogador": "Sérgio"
+    },
+    "ESQ_10574_DIR_12804": {
+        "id_esq": "10574",
+        "id_dir": "12804",
+        "jogador": "Sérgio"
+    },
+    "ESQ_3232_DIR_8753": {
+        "id_esq": "3232",
+        "id_dir": "8753",
+        "jogador": "Thiago"
+    },
+    "ESQ_3232_DIR_16097": {
+        "id_esq": "3232",
+        "id_dir": "16097",
+        "jogador": "Thiago"
+    },
+    "ESQ_3232_DIR_57": {
+        "id_esq": "3232",
+        "id_dir": "57",
+        "jogador": "Thiago"
+    },
+    "ESQ_4017_DIR_8753": {
+        "id_esq": "4017",
+        "id_dir": "8753",
+        "jogador": "Thiago"
+    },
+    "ESQ_4017_DIR_16097": {
+        "id_esq": "4017",
+        "id_dir": "16097",
+        "jogador": "Thiago"
+    },
+    "ESQ_4017_DIR_57": {
+        "id_esq": "4017",
+        "id_dir": "57",
+        "jogador": "Thiago"
+    },
+    "ESQ_9519_DIR_8753": {
+        "id_esq": "9519",
+        "id_dir": "8753",
+        "jogador": "Thiago"
+    },
+    "ESQ_9519_DIR_16097": {
+        "id_esq": "9519",
+        "id_dir": "16097",
+        "jogador": "Thiago"
+    },
+    "ESQ_9519_DIR_57": {
+        "id_esq": "9519",
+        "id_dir": "57",
+        "jogador": "Thiago"
+    },
+    "ESQ_57_DIR_8753": {
+        "id_esq": "57",
+        "id_dir": "8753",
+        "jogador": "Thiago"
+    },
+    "ESQ_57_DIR_16097": {
+        "id_esq": "57",
+        "id_dir": "16097",
+        "jogador": "Thiago"
+    },
+    "ESQ_57_DIR_57": {
+        "id_esq": "57",
+        "id_dir": "57",
+        "jogador": "Thiago"
+    },
+    "ESQ_1791_DIR_77": {
+        "id_esq": "1791",
+        "id_dir": "77",
+        "jogador": "Wilson"
+    },
+    "ESQ_6593_DIR_77": {
+        "id_esq": "6593",
+        "id_dir": "77",
+        "jogador": "Wilson"
+    },
+    "ESQ_15290_DIR_77": {
+        "id_esq": "15290",
+        "id_dir": "77",
+        "jogador": "Wilson"
+    },
+    "ESQ_18100_DIR_77": {
+        "id_esq": "18100",
+        "id_dir": "77",
+        "jogador": "Wilson"
+    },
+    "ESQ_77_DIR_77": {
+        "id_esq": "77",
+        "id_dir": "77",
+        "jogador": "Wilson"
+    },
+    "ESQ_69_DIR_77": {
+        "id_esq": "69",
+        "id_dir": "77",
+        "jogador": "Wilson"
+    },
+    "ESQ_163_DIR_77": {
+        "id_esq": "163",
+        "id_dir": "77",
+        "jogador": "Wilson"
+    },
+    "ESQ_231_DIR_77": {
+        "id_esq": "231",
+        "id_dir": "77",
+        "jogador": "Wilson"
+    },
+    "ESQ_1321_DIR_5": {
+        "id_esq": "1321",
+        "id_dir": "5",
+        "jogador": "Éder"
+    },
+    "ESQ_1321_DIR_70": {
+        "id_esq": "1321",
+        "id_dir": "70",
+        "jogador": "Éder"
+    },
+    "ESQ_1321_DIR_213": {
+        "id_esq": "1321",
+        "id_dir": "213",
+        "jogador": "Éder"
+    },
+    "ESQ_1946_DIR_5": {
+        "id_esq": "1946",
+        "id_dir": "5",
+        "jogador": "Éder"
+    },
+    "ESQ_1946_DIR_70": {
+        "id_esq": "1946",
+        "id_dir": "70",
+        "jogador": "Éder"
+    },
+    "ESQ_1946_DIR_213": {
+        "id_esq": "1946",
+        "id_dir": "213",
+        "jogador": "Éder"
+    },
+    "ESQ_11164_DIR_5": {
+        "id_esq": "11164",
+        "id_dir": "5",
+        "jogador": "Éder"
+    },
+    "ESQ_11164_DIR_70": {
+        "id_esq": "11164",
+        "id_dir": "70",
+        "jogador": "Éder"
+    },
+    "ESQ_11164_DIR_213": {
+        "id_esq": "11164",
+        "id_dir": "213",
+        "jogador": "Éder"
+    },
+    "ESQ_11304_DIR_5": {
+        "id_esq": "11304",
+        "id_dir": "5",
+        "jogador": "Éder"
+    },
+    "ESQ_11304_DIR_70": {
+        "id_esq": "11304",
+        "id_dir": "70",
+        "jogador": "Éder"
+    },
+    "ESQ_11304_DIR_213": {
+        "id_esq": "11304",
+        "id_dir": "213",
+        "jogador": "Éder"
+    },
+    "ESQ_17916_DIR_5": {
+        "id_esq": "17916",
+        "id_dir": "5",
+        "jogador": "Éder"
+    },
+    "ESQ_17916_DIR_70": {
+        "id_esq": "17916",
+        "id_dir": "70",
+        "jogador": "Éder"
+    },
+    "ESQ_17916_DIR_213": {
+        "id_esq": "17916",
+        "id_dir": "213",
+        "jogador": "Éder"
+    },
+    "ESQ_5_DIR_5": {
+        "id_esq": "5",
+        "id_dir": "5",
+        "jogador": "Éder"
+    },
+    "ESQ_5_DIR_70": {
+        "id_esq": "5",
+        "id_dir": "70",
+        "jogador": "Éder"
+    },
+    "ESQ_5_DIR_213": {
+        "id_esq": "5",
+        "id_dir": "213",
+        "jogador": "Éder"
+    },
+    "ESQ_1677_DIR_11694": {
+        "id_esq": "1677",
+        "id_dir": "11694",
+        "jogador": "Édson"
+    },
+    "ESQ_1677_DIR_14922": {
+        "id_esq": "1677",
+        "id_dir": "14922",
+        "jogador": "Édson"
+    },
+    "ESQ_1677_DIR_11": {
+        "id_esq": "1677",
+        "id_dir": "11",
+        "jogador": "Édson"
+    },
+    "ESQ_1677_DIR_152": {
+        "id_esq": "1677",
+        "id_dir": "152",
+        "jogador": "Édson"
+    },
+    "ESQ_1677_DIR_166": {
+        "id_esq": "1677",
+        "id_dir": "166",
+        "jogador": "Édson"
+    },
+    "ESQ_2617_DIR_11694": {
+        "id_esq": "2617",
+        "id_dir": "11694",
+        "jogador": "Édson"
+    },
+    "ESQ_2617_DIR_14922": {
+        "id_esq": "2617",
+        "id_dir": "14922",
+        "jogador": "Édson"
+    },
+    "ESQ_2617_DIR_11": {
+        "id_esq": "2617",
+        "id_dir": "11",
+        "jogador": "Édson"
+    },
+    "ESQ_2617_DIR_152": {
+        "id_esq": "2617",
+        "id_dir": "152",
+        "jogador": "Édson"
+    },
+    "ESQ_2617_DIR_166": {
+        "id_esq": "2617",
+        "id_dir": "166",
+        "jogador": "Édson"
+    },
+    "ESQ_7318_DIR_11694": {
+        "id_esq": "7318",
+        "id_dir": "11694",
+        "jogador": "Édson"
+    },
+    "ESQ_7318_DIR_14922": {
+        "id_esq": "7318",
+        "id_dir": "14922",
+        "jogador": "Édson"
+    },
+    "ESQ_7318_DIR_11": {
+        "id_esq": "7318",
+        "id_dir": "11",
+        "jogador": "Édson"
+    },
+    "ESQ_7318_DIR_152": {
+        "id_esq": "7318",
+        "id_dir": "152",
+        "jogador": "Édson"
+    },
+    "ESQ_7318_DIR_166": {
+        "id_esq": "7318",
+        "id_dir": "166",
+        "jogador": "Édson"
+    },
+    "ESQ_11_DIR_11694": {
+        "id_esq": "11",
+        "id_dir": "11694",
+        "jogador": "Édson"
+    },
+    "ESQ_11_DIR_14922": {
+        "id_esq": "11",
+        "id_dir": "14922",
+        "jogador": "Édson"
+    },
+    "ESQ_11_DIR_11": {
+        "id_esq": "11",
+        "id_dir": "11",
+        "jogador": "Édson"
+    },
+    "ESQ_11_DIR_152": {
+        "id_esq": "11",
+        "id_dir": "152",
+        "jogador": "Édson"
+    },
+    "ESQ_11_DIR_166": {
+        "id_esq": "11",
+        "id_dir": "166",
+        "jogador": "Édson"
+    },
+    "ESQ_166_DIR_11694": {
+        "id_esq": "166",
+        "id_dir": "11694",
+        "jogador": "Édson"
+    },
+    "ESQ_166_DIR_14922": {
+        "id_esq": "166",
+        "id_dir": "14922",
+        "jogador": "Édson"
+    },
+    "ESQ_166_DIR_11": {
+        "id_esq": "166",
+        "id_dir": "11",
+        "jogador": "Édson"
+    },
+    "ESQ_166_DIR_152": {
+        "id_esq": "166",
+        "id_dir": "152",
+        "jogador": "Édson"
+    },
+    "ESQ_166_DIR_166": {
+        "id_esq": "166",
+        "id_dir": "166",
+        "jogador": "Édson"
+    }
+}

@@ -1,0 +1,66 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+tts-env~/
+*.egg-info/
+dist/
+build/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Datasets e Uploads (muito grandes)
+jogadores_terca/
+dataset_reid/
+static/uploads/*
+!static/uploads/.gitkeep
+*.mp4
+*.avi
+*.mov
+
+# Modelos treinados (grandes demais para o GitHub)
+*.pth
+*.pt
+!yolo11n.pt
+*.onnx
+
+# Dados sensíveis / específicos do usuário
+jogadores_com_ids.json
+times.json
+historico_capturas.json
+
+# Saídas geradas (heatmaps, CSVs de posição, estado)
+static/heatmaps/*
+!static/heatmaps/.gitkeep
+static/posicoes_*.csv
+
+# Logs
+*.log
+logs/
+flask.log
+kernel.errors.txt
+
+# Temporários
+*.tmp
+*.temp
+temp/
+
+# Pastas de atleta soltas na raiz (artefatos)
+/Vini JR/
+
+# Vídeos e pasta videos (manter estrutura)
+videos/*
+!videos/.gitkeep

@@ -1,0 +1,32 @@
+# Computer Vision
+opencv-python==4.13.0.92       # última estável (fev/2026)
+ultralytics==8.4.14             # YOLO11/YOLO26 suportados
+
+# Tracking
+supervision==0.27.0.post1       # última estável
+
+# Deep Learning
+torch==2.8.0                    # última estável
+torchvision==0.23.0             # compatível com torch 2.8.0
+
+# Web Framework
+Flask==3.1.2                    # última estável
+
+# Data Processing
+# ATENÇÃO: numpy 2.x tem breaking changes — mantendo 1.26.4 (última 1.x)
+numpy==1.26.4
+pandas>=2.0.0
+scikit-learn>=1.3.0
+
+# Image Processing
+Pillow==11.3.0                  # última estável
+
+# Progress Bars
+tqdm>=4.65.0
+
+# Video Download (opcional)
+yt-dlp>=2023.12.0
+
+# Charts e Visualização (opcional)
+matplotlib>=3.7.0
+seaborn>=0.12.0

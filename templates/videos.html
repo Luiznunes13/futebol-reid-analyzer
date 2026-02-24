@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Captura — Terça Nobre</title>
+  <link rel="stylesheet" href="/static/css/theme.css" />
+  <link rel="stylesheet" href="/static/css/videos.css" />
+</head>
+<body>
+
+  <!-- ======================== NAVBAR ======================== -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <span class="brand-icon">⚽</span>
+        <span class="brand-text">Terça Nobre</span>
+      </div>
+      <div class="nav-links">
+        <a href="/" class="nav-link">Dashboard</a>
+        <a href="/classificar" class="nav-link">Classificar</a>
+        <a href="/elenco" class="nav-link">Elenco</a>
+        <a href="/captura" class="nav-link active">Captura</a>
+        <a href="/atleta" class="nav-link">Atleta</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ====================== PAGE HEADER ===================== -->
+  <div class="page-header">
+    <h1 class="page-title">Captura de Imagens</h1>
+    <p class="page-subtitle">Selecione os vídeos, configure e extraia fotos dos jogadores</p>
+  </div>
+
+  <!-- ======================== MAIN ========================== -->
+  <div class="videos-container">
+
+    <!-- ---- Toast ---- -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- ═══ ETAPA 1 — Selecionar vídeos ═══ -->
+    <div class="step-section" id="step-1">
+      <div class="step-header">
+        <div class="step-number-badge">1</div>
+        <div class="step-info">
+          <div class="step-title">Selecionar vídeos</div>
+          <div class="step-desc">Escolha um vídeo para cada câmera — YouTube ou arquivo local</div>
+        </div>
+      </div>
+
+      <!-- Toggle dual-cam -->
+      <div class="dual-cam-row">
+        <label class="dual-cam-toggle">
+          <input type="checkbox" id="toggle-dual-cam" onchange="toggleDualCam(this.checked)" />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          <span class="toggle-label">Usar dois vídeos (câmeras diferentes)</span>
+        </label>
+        <span class="dual-cam-hint" id="dual-cam-hint">Modo atual: <strong>1 vídeo</strong> (mesmo arquivo para ESQ e DIR)</span>
+      </div>
+
+    <!-- ---- Câmeras ---- -->
+    <div class="cameras-grid" id="cameras-grid">
+
+      <!-- Câmera ESQ -->
+      <div class="camera-card" id="card-esq">
+        <div class="camera-header esq">
+          <span class="camera-icon">①</span>
+          <div>
+            <div class="camera-label">Câmera 1</div>
+            <div class="camera-sublabel">Time 1</div>
+          </div>
+        </div>
+
+        <div class="camera-body">
+          <!-- Fonte: YouTube -->
+          <div class="source-tabs">
+            <button class="source-tab active" data-cam="esq" data-source="youtube" onclick="setSource('esq','youtube')">YouTube</button>
+            <button class="source-tab"        data-cam="esq" data-source="local"   onclick="setSource('esq','local')">Arquivo local</button>
+          </div>
+
+          <!-- Painel YouTube -->
+          <div class="source-panel" id="esq-panel-youtube">
+            <div class="url-row">
+              <input type="text" id="esq-url" class="url-input" placeholder="Cole a URL do YouTube..." />
+              <button class="btn-buscar" onclick="buscarInfo('esq')">🔍 Buscar</button>
+            </div>
+            <div id="esq-info" class="video-info hidden">
+              <img id="esq-thumb" src="" alt="" class="video-thumb" />
+              <div class="video-meta">
+                <div id="esq-title"    class="video-title"></div>
+                <div id="esq-uploader" class="video-uploader"></div>
+                <div id="esq-duration" class="video-duration"></div>
+              </div>
+            </div>
+            <div class="yt-actions">
+              <button class="btn-stream" id="esq-btn-stream" onclick="usarStream('esq')" disabled>▶ Usar stream</button>
+              <span class="dl-hint">Stream = sem download, mas pode travar em vídeos longos</span>
+            </div>
+          </div>
+
+          <!-- Painel Local -->
+          <div class="source-panel hidden" id="esq-panel-local">
+            <button class="btn-browse" id="esq-btn-browse" onclick="escolherArquivo('esq')">
+              📂 Procurar no computador…
+            </button>
+          </div>
+
+          <!-- Selecionado -->
+          <div id="esq-selected" class="selected-badge hidden">
+            <span class="selected-icon">✅</span>
+            <span id="esq-selected-name" class="selected-name"></span>
+            <button class="selected-clear" onclick="limparSelecao('esq')">✕</button>
+          </div>
+        </div>
+      </div><!-- /card-esq -->
+
+      <!-- Câmera DIR -->
+      <div class="camera-card" id="card-dir">
+        <div class="camera-header dir">
+          <span class="camera-icon">②</span>
+          <div>
+            <div class="camera-label">Câmera 2</div>
+            <div class="camera-sublabel">Time 2</div>
+          </div>
+        </div>
+
+        <div class="camera-body">
+          <div class="source-tabs">
+            <button class="source-tab active" data-cam="dir" data-source="youtube" onclick="setSource('dir','youtube')">YouTube</button>
+            <button class="source-tab"        data-cam="dir" data-source="local"   onclick="setSource('dir','local')">Arquivo local</button>
+          </div>
+
+          <div class="source-panel" id="dir-panel-youtube">
+            <div class="url-row">
+              <input type="text" id="dir-url" class="url-input" placeholder="Cole a URL do YouTube..." />
+              <button class="btn-buscar" onclick="buscarInfo('dir')">🔍 Buscar</button>
+            </div>
+            <div id="dir-info" class="video-info hidden">
+              <img id="dir-thumb" src="" alt="" class="video-thumb" />
+              <div class="video-meta">
+                <div id="dir-title"    class="video-title"></div>
+                <div id="dir-uploader" class="video-uploader"></div>
+                <div id="dir-duration" class="video-duration"></div>
+              </div>
+            </div>
+            <div class="yt-actions">
+              <button class="btn-stream" id="dir-btn-stream" onclick="usarStream('dir')" disabled>▶ Usar stream</button>
+              <span class="dl-hint">Stream = sem download, mas pode travar em vídeos longos</span>
+            </div>
+          </div>
+
+          <div class="source-panel hidden" id="dir-panel-local">
+            <button class="btn-browse" id="dir-btn-browse" onclick="escolherArquivo('dir')">
+              📂 Procurar no computador…
+            </button>
+          </div>
+
+          <div id="dir-selected" class="selected-badge hidden">
+            <span class="selected-icon">✅</span>
+            <span id="dir-selected-name" class="selected-name"></span>
+            <button class="selected-clear" onclick="limparSelecao('dir')">✕</button>
+          </div>
+        </div>
+      </div><!-- /card-dir -->
+
+    </div><!-- /cameras-grid -->
+    </div><!-- /step-1 -->
+
+    <!-- ═══ ETAPA 2 — Configurações ═══ -->
+    <div class="step-section" id="step-2">
+      <div class="step-header">
+        <div class="step-number-badge">2</div>
+        <div class="step-info">
+          <div class="step-title">Configurações</div>
+          <div class="step-desc">Ajuste o modelo de detecção, a sensibilidade e a pasta de saída</div>
+        </div>
+      </div>
+
+      <div class="config-grid">
+
+        <div class="config-field">
+          <label class="config-label" for="cfg-model">Modelo YOLO</label>
+          <select id="cfg-model" class="config-select">
+            <option value="yolo11n.pt" selected>yolo11n — Nano (rápido, leve)</option>
+            <option value="yolo11s.pt">yolo11s — Small (equilibrado)</option>
+            <option value="yolo11m.pt">yolo11m — Medium (preciso, lento)</option>
+          </select>
+          <span class="config-hint">Nano é recomendado para a maioria dos casos</span>
+        </div>
+
+        <div class="config-field">
+          <label class="config-label" for="cfg-confidence">
+            Confiança mínima: <strong id="cfg-confidence-val">0.50</strong>
+          </label>
+          <input type="range" id="cfg-confidence" class="config-range"
+                 min="0.1" max="0.95" step="0.05" value="0.5"
+                 oninput="document.getElementById('cfg-confidence-val').textContent = parseFloat(this.value).toFixed(2)" />
+          <div class="config-range-labels"><span>0.10 (mais detecções)</span><span>0.95 (só certezas)</span></div>
+        </div>
+
+        <div class="config-field">
+          <label class="config-label" for="cfg-output">Pasta de saída</label>
+          <input type="text" id="cfg-output" class="config-input" value="jogadores_terca"
+                 placeholder="Nome da pasta onde as imagens serão salvas" />
+          <span class="config-hint">Relativa à raiz do projeto</span>
+        </div>
+
+      </div>
+    </div><!-- /step-2 -->
+
+    <!-- ═══ ETAPA 3 — Iniciar captura ═══ -->
+    <div class="step-section" id="step-3">
+      <div class="step-header">
+        <div class="step-number-badge">3</div>
+        <div class="step-info">
+          <div class="step-title">Iniciar captura</div>
+          <div class="step-desc">Processe os vídeos e extraia imagens dos jogadores em background</div>
+        </div>
+      </div>
+
+    <!-- ---- Botão PROCESSAR ---- -->
+    <div class="processar-section">
+      <button class="btn-processar" id="btn-processar" onclick="processarVideos()" disabled>
+        🚀 Iniciar Captura de Imagens
+      </button>
+      <button class="btn-parar hidden" id="btn-parar" onclick="pararCaptura()">
+        ⏹ Parar Captura
+      </button>
+      <p class="processar-hint">
+        O script roda em background (pode demorar vários minutos).
+        Acompanhe o progresso no terminal ou nos logs.
+      </p>
+    </div>
+
+    <!-- ---- Status ---- -->
+    <div id="status-box" class="status-box hidden">
+      <div class="status-header">
+        <span id="status-icon">⚙️</span>
+        <strong id="status-title">Processando…</strong>
+        <span id="status-badge" class="status-badge hidden"></span>
+        <span class="status-spacer"></span>
+        <div id="status-counters" class="status-counters hidden">
+          <div class="counter-item">
+            <div id="counter-new"  class="counter-value">0</div>
+            <div class="counter-label">novas capturas</div>
+          </div>
+          <div class="counter-divider"></div>
+          <div class="counter-item">
+            <div id="counter-total" class="counter-value">—</div>
+            <div class="counter-label">total no banco</div>
+          </div>
+        </div>
+      </div>
+      <pre id="status-msg" class="status-msg"></pre>
+      <div id="status-log-wrap" class="status-log-wrap hidden">
+        <div class="log-header">
+          <span>📋 Log do script</span>
+          <label class="log-autoscroll">
+            <input type="checkbox" id="log-autoscroll" checked /> auto-scroll
+          </label>
+        </div>
+        <pre id="status-log" class="status-log"></pre>
+      </div>
+    </div><!-- /status-box -->
+    </div><!-- /step-3 -->
+
+    <!-- ---- Histórico de capturas (colapsável) ---- -->
+    <div class="section-card collapsible-card" id="card-historico">
+      <div class="section-header collapsible-trigger" onclick="toggleHistorico()">
+        <h2 class="section-title">🕓 Histórico de Capturas <span id="historico-count" class="lista-count"></span></h2>
+        <div class="section-header-actions">
+          <button class="btn-refresh" onclick="event.stopPropagation(); carregarHistorico(true)">🔄 Atualizar</button>
+          <span class="collapse-chevron" id="historico-chevron">▼</span>
+        </div>
+      </div>
+      <div id="historico-wrap" class="collapsible-body collapsed">
+        <div class="loading-row">Carregando…</div>
+      </div>
+    </div>
+
+  </div><!-- /videos-container -->
+
+  <script src="/static/js/videos.js"></script>
+</body>
+</html>

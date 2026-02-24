@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Elenco - Terça Nobre</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/elenco.css') }}">
+</head>
+<body>
+    <!-- Navegação -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon">⚽</span>
+                <span class="brand-text">Terça Nobre</span>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">Dashboard</a>
+                <a href="/classificar" class="nav-link">Classificar</a>
+                <a href="/elenco" class="nav-link active">Elenco</a>
+                <a href="/captura" class="nav-link">Captura</a>
+                <a href="/atleta" class="nav-link">Atleta</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Cabeçalho -->
+    <header class="page-header">
+        <div class="container">
+            <h1>👥 Gerenciar Elenco</h1>
+            <p>Organize os jogadores dos times 1 e 2</p>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="container">
+        <!-- Estatísticas -->
+        <div class="stats-row">
+            <div class="stat-card azul">
+                <div class="stat-icon">🔵</div>
+                <div class="stat-info">
+                    <div class="stat-label">Time 1</div>
+                    <div class="stat-value" id="stat-azul">{{ time_azul|length }}</div>
+                </div>
+            </div>
+            <div class="stat-card preto">
+                <div class="stat-icon">⚫</div>
+                <div class="stat-info">
+                    <div class="stat-label">Time 2</div>
+                    <div class="stat-value" id="stat-preto">{{ time_preto|length }}</div>
+                </div>
+            </div>
+            <div class="stat-card total">
+                <div class="stat-icon">👥</div>
+                <div class="stat-info">
+                    <div class="stat-label">Total</div>
+                    <div class="stat-value" id="stat-total">{{ time_azul|length + time_preto|length }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Times -->
+        <div class="teams-container">
+            <!-- Time Azul -->
+            <div class="team-section azul">
+                <div class="team-header">
+                    <h2>● Time 1</h2>
+                    <button class="btn btn-primary" onclick="abrirModalAdicionar('azul')">
+                        <span class="icon">➕</span>
+                        Adicionar
+                    </button>
+                </div>
+                <div class="players-list" id="list-azul">
+                    {% for jogador in time_azul %}
+                    <div class="player-card" data-nome="{{ jogador }}" data-time="azul">
+                        <div class="player-info">
+                            <div class="player-avatar">{{ jogador[0] }}</div>
+                            <div class="player-name">{{ jogador }}</div>
+                        </div>
+                        <div class="player-actions">
+                            <button class="btn-icon btn-move" onclick="moverJogador('{{ jogador }}', 'azul', 'preto')" title="Mover para Time 2">
+                                <span>➡️</span>
+                            </button>
+                            <button class="btn-icon btn-delete" onclick="confirmarRemover('{{ jogador }}', 'azul')" title="Remover">
+                                <span>🗑️</span>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Time Preto -->
+            <div class="team-section preto">
+                <div class="team-header">
+                    <h2>○ Time 2</h2>
+                    <button class="btn btn-primary" onclick="abrirModalAdicionar('preto')">
+                        <span class="icon">➕</span>
+                        Adicionar
+                    </button>
+                </div>
+                <div class="players-list" id="list-preto">
+                    {% for jogador in time_preto %}
+                    <div class="player-card" data-nome="{{ jogador }}" data-time="preto">
+                        <div class="player-info">
+                            <div class="player-avatar">{{ jogador[0] }}</div>
+                            <div class="player-name">{{ jogador }}</div>
+                        </div>
+                        <div class="player-actions">
+                            <button class="btn-icon btn-move" onclick="moverJogador('{{ jogador }}', 'preto', 'azul')" title="Mover para Time 1">
+                                <span>⬅️</span>
+                            </button>
+                            <button class="btn-icon btn-delete" onclick="confirmarRemover('{{ jogador }}', 'preto')" title="Remover">
+                                <span>🗑️</span>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Adicionar Jogador -->
+    <div id="modalAdicionar" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">➕ Adicionar Jogador</h3>
+                <button class="btn-close" onclick="fecharModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="nomeJogador">Nome do Jogador</label>
+                    <input type="text" id="nomeJogador" class="form-input" placeholder="Digite o nome completo" autocomplete="off">
+                </div>
+                <input type="hidden" id="timeDestino">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+                <button class="btn btn-success" onclick="adicionarJogador()">Adicionar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de Notificação -->
+    <div id="toast" class="toast"></div>
+
+    <script src="{{ url_for('static', filename='js/elenco.js') }}"></script>
+</body>
+</html>

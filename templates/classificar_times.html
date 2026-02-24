@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classificar — Terça Nobre</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/classificar.css') }}">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <span class="brand-icon">⚽</span>
+        <span class="brand-text">Terça Nobre</span>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a></li>
+        <li><a href="{{ url_for('classificar_times') }}" class="nav-link active">Classificar</a></li>
+        <li><a href="{{ url_for('elenco') }}" class="nav-link">Elenco</a></li>
+        <li><a href="/captura" class="nav-link">Captura</a></li>
+        <li><a href="/atleta" class="nav-link">Atleta</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="page-classificar">
+
+    <!-- Header / Stats -->
+    <div class="cls-header">
+      <h1>Classificador por Times</h1>
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-number">{{ total }}</div>
+          <div class="stat-label">Total de IDs</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">{{ classificados }}</div>
+          <div class="stat-label">Classificados</div>
+        </div>
+        <div class="stat azul">
+          <div class="stat-number">{{ stats_azul }}</div>
+          <div class="stat-label">Time 1</div>
+        </div>
+        <div class="stat preto">
+          <div class="stat-number">{{ stats_preto }}</div>
+          <div class="stat-label">Time 2</div>
+        </div>
+        <div class="stat danger">
+          <div class="stat-number" id="count-descartados">{{ stats_descartados }}</div>
+          <div class="stat-label">Descartados</div>
+          <button id="btn-limpar-desc"
+            onclick="limparDescartados()"
+            {% if stats_descartados_files == 0 %}disabled{% endif %}>
+            🗑️ Limpar (<span id="count-desc-files">{{ stats_descartados_files }}</span> imgs)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Times -->
+    <div class="times-container">
+      <div class="time-box azul">
+        <div class="time-title azul">● Time 1 ({{ time_azul|length }} jogadores)</div>
+        <div class="jogadores-grid">
+          {% for jogador in time_azul %}
+          <button class="jogador-btn azul" onclick="selecionarJogador('{{ jogador }}')">{{ jogador }}</button>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="time-box preto">
+        <div class="time-title preto">○ Time 2 ({{ time_preto|length }} jogadores)</div>
+        <div class="jogadores-grid">
+          {% for jogador in time_preto %}
+          <button class="jogador-btn preto" onclick="selecionarJogador('{{ jogador }}')">{{ jogador }}</button>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <strong>Filtros:</strong>
+      <button class="filter-btn active" onclick="filtrar('todos', this)">Todos</button>
+      <button class="filter-btn" onclick="filtrar('pendentes', this)">Pendentes</button>
+      <button class="filter-btn" onclick="filtrar('classificados', this)">Classificados</button>
+      <button class="filter-btn" onclick="filtrar('descartados', this)">Descartados</button>
+      <span class="filter-spacer"></span>
+      <button class="filter-btn primary" onclick="iniciarClassificacaoRapida()">🚀 Classificação Rápida</button>
+      <button class="filter-btn danger" onclick="resetarClassificacoes()">🗑️ Resetar Tudo</button>
+    </div>
+
+    <!-- Cards -->
+    <div class="grid" id="grid">
+      {% for item in ids_data %}
+      {% set is_desc = item.nome == 'DESCARTADO' %}
+      {% set tc = 'azul' if item.nome in time_azul else 'preto' if item.nome in time_preto else 'descartado' if is_desc else '' %}
+      <div class="card {{ 'descartado' if is_desc else 'classificado' if item.nome else '' }}"
+           data-id="{{ item.id }}"
+           data-status="{{ 'descartado' if is_desc else 'classificado' if item.nome else 'pendente' }}">
+        <img src="/jogadores_terca/{{ item.imgs[0] }}" class="card-img" onclick="verImagem(this.src)" alt="ID {{ item.id }}">
+        <div class="card-info">
+          <div class="card-id">ID: {{ item.id }}</div>
+          {% if item.nome %}
+          <div class="card-nome {{ tc }}" onclick="limparNome('{{ item.id }}')">{{ item.nome }}</div>
+          <button class="limpar-btn" onclick="limparNome('{{ item.id }}')">Limpar</button>
+          {% else %}
+          <p class="card-pendente">Não classificado</p>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <!-- Lightbox -->
+  <div id="modal-lightbox" class="modal-lightbox" onclick="fecharModal()">
+    <span class="close">&times;</span>
+    <img id="modal-img" src="" alt="">
+  </div>
+
+  <!-- Modal Classificação Rápida -->
+  <div id="modal-rapida" class="modal-rapida">
+    <div class="modal-rapida-content">
+      <div class="modal-header">
+        <div class="progress-info">
+          <span id="progress-text">0 / 0</span>
+          <div class="progress-bar-wrap">
+            <div id="progress-bar" class="progress-bar"></div>
+          </div>
+        </div>
+        <button class="btn-fechar" onclick="fecharClassificacaoRapida()">✕ Fechar</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="imagem-container">
+          <img id="img-rapida" src="" alt="Jogador">
+          <div class="imagem-badge" id="id-rapida">ID: --</div>
+        </div>
+
+        <div class="jogadores-container">
+          <div class="time-section">
+            <div class="time-section-title azul">● Time 1</div>
+            <div class="jogadores-btns" id="btns-azul">
+              {% for jogador in time_azul %}
+              <button class="btn-jogador azul" onclick="classificarRapido('{{ jogador }}')">
+                <span>{{ jogador }}</span><span class="badge-count">0</span>
+              </button>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="time-section">
+            <div class="time-section-title preto">○ Time 2</div>
+            <div class="jogadores-btns" id="btns-preto">
+              {% for jogador in time_preto %}
+              <button class="btn-jogador preto" onclick="classificarRapido('{{ jogador }}')">
+                <span>{{ jogador }}</span><span class="badge-count">0</span>
+              </button>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="acoes-rapidas">
+            <button class="btn-acao" onclick="voltarRapido()">⏮ Voltar</button>
+            <button class="btn-acao descartar" onclick="descartarRapido()">🗑 Descartar</button>
+            <button class="btn-acao" onclick="pularRapido()">Pular ⏭</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <div class="atalhos-info">
+          💡 <strong>ESC</strong> Fechar &nbsp;·&nbsp;
+          <strong>→</strong> Pular &nbsp;·&nbsp;
+          <strong>←</strong> Voltar &nbsp;·&nbsp;
+          <strong>D / Del</strong> Descartar &nbsp;·&nbsp;
+          <strong>1-9</strong> Jogador
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let idsParaClassificar = [];
+    let indiceAtual = 0;
+    const todosJogadores = {{ (time_azul + time_preto) | tojson }};
+    let classificacoesAtuais = {{ ids_data | tojson }};
+
+    function verImagem(src) {
+      document.getElementById('modal-img').src = src;
+      document.getElementById('modal-lightbox').style.display = 'block';
+    }
+    function fecharModal() { document.getElementById('modal-lightbox').style.display = 'none'; }
+
+    function filtrar(tipo, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      document.querySelectorAll('#grid .card').forEach(card => {
+        const s = card.dataset.status;
+        const show = tipo === 'todos'
+          || (tipo === 'pendentes'     && s === 'pendente')
+          || (tipo === 'classificados' && s === 'classificado')
+          || (tipo === 'descartados'   && s === 'descartado');
+        card.style.display = show ? '' : 'none';
+      });
+    }
+
+    function salvarNome(id, nome, onDone) {
+      fetch('/salvar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, nome })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (nome === 'DESCARTADO' && data.moved > 0) {
+          const span  = document.getElementById('count-desc-files');
+          const cdesc = document.getElementById('count-descartados');
+          const btn   = document.getElementById('btn-limpar-desc');
+          span.textContent  = parseInt(span.textContent  || '0') + data.moved;
+          cdesc.textContent = parseInt(cdesc.textContent || '0') + 1;
+          btn.disabled = false;
+        }
+        if (onDone) onDone(data);
+      });
+    }
+
+    function limparNome(id)           { salvarNome(id, '', () => location.reload()); }
+    function selecionarJogador(nome)  {
+      const p = document.querySelector('.card[data-status="pendente"]');
+      if (p) salvarNome(p.dataset.id, nome, () => location.reload());
+    }
+
+    function limparDescartados() {
+      const count = document.getElementById('count-desc-files').textContent;
+      if (!confirm(`Apagar permanentemente ${count} imagem(ns) descartada(s)?\n\nEsta ação não pode ser desfeita.`)) return;
+      const btn = document.getElementById('btn-limpar-desc');
+      btn.disabled = true; btn.textContent = 'Apagando…';
+      fetch('/api/descartados/limpar', { method: 'POST' })
+        .then(r => r.json())
+        .then(d => {
+          if (d.success) {
+            document.getElementById('count-desc-files').textContent = '0';
+            document.getElementById('count-descartados').textContent = '0';
+            btn.innerHTML = '🗑️ Limpar (<span id="count-desc-files">0</span> imgs)';
+            btn.disabled = true;
+            alert(`✅ ${d.deletados} imagem(ns) apagada(s).`);
+          }
+        });
+    }
+
+    function resetarClassificacoes() {
+      if (!confirm('⚠️ Apagar TODAS as classificações?\n\nEsta ação não pode ser desfeita.')) return;
+      fetch('/reset', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+        .then(r => r.json())
+        .then(() => { alert('✓ Resetado!'); location.reload(); });
+    }
+
+    /* --- Classificação Rápida --- */
+    function contarClassificacoes() {
+      const c = {};
+      todosJogadores.forEach(j => c[j] = 0);
+      classificacoesAtuais.forEach(item => {
+        if (item.nome && item.nome !== 'DESCARTADO' && todosJogadores.includes(item.nome)) c[item.nome]++;
+      });
+      return c;
+    }
+
+    function atualizarContadores() {
+      const c = contarClassificacoes();
+      document.querySelectorAll('.btn-jogador').forEach(btn => {
+        const nome  = btn.querySelector('span:first-child')?.textContent?.trim();
+        const badge = btn.querySelector('.badge-count');
+        if (nome && badge) badge.textContent = c[nome] ?? 0;
+      });
+    }
+
+    function iniciarClassificacaoRapida() {
+      idsParaClassificar = Array.from(document.querySelectorAll('.card[data-status="pendente"]')).map(card => ({
+        id:  card.dataset.id,
+        img: card.querySelector('.card-img').src
+      }));
+      if (!idsParaClassificar.length) { alert('🎉 Todos os IDs já foram classificados!'); return; }
+      indiceAtual = 0;
+      document.getElementById('modal-rapida').style.display = 'block';
+      atualizarContadores();
+      carregarImagemRapida();
+    }
+
+    function fecharClassificacaoRapida() {
+      document.getElementById('modal-rapida').style.display = 'none';
+      location.reload();
+    }
+
+    function carregarImagemRapida() {
+      if (indiceAtual >= idsParaClassificar.length) { alert('🎉 Classificação completa!'); fecharClassificacaoRapida(); return; }
+      const item  = idsParaClassificar[indiceAtual];
+      const total = idsParaClassificar.length;
+      const atual = indiceAtual + 1;
+      document.getElementById('img-rapida').src = item.img;
+      document.getElementById('id-rapida').textContent  = `ID: ${item.id}`;
+      document.getElementById('progress-text').textContent = `${atual} / ${total} (${Math.round(atual/total*100)}%)`;
+      document.getElementById('progress-bar').style.width = `${atual/total*100}%`;
+    }
+
+    function classificarRapido(nome) {
+      const item = idsParaClassificar[indiceAtual];
+      salvarNome(item.id, nome, () => {
+        const idx = classificacoesAtuais.findIndex(c => c.id === item.id);
+        if (idx !== -1) classificacoesAtuais[idx].nome = nome;
+        atualizarContadores();
+        indiceAtual++;
+        carregarImagemRapida();
+      });
+    }
+
+    function descartarRapido() {
+      const item = idsParaClassificar[indiceAtual];
+      salvarNome(item.id, 'DESCARTADO', () => {
+        const idx = classificacoesAtuais.findIndex(c => c.id === item.id);
+        if (idx !== -1) classificacoesAtuais[idx].nome = 'DESCARTADO';
+        indiceAtual++;
+        carregarImagemRapida();
+      });
+    }
+
+    function pularRapido()  { indiceAtual++; carregarImagemRapida(); }
+    function voltarRapido() { if (indiceAtual > 0) { indiceAtual--; carregarImagemRapida(); } }
+
+    document.addEventListener('keydown', e => {
+      if (document.getElementById('modal-rapida').style.display !== 'block') return;
+      if      (e.key === 'Escape')     fecharClassificacaoRapida();
+      else if (e.key === 'ArrowRight') pularRapido();
+      else if (e.key === 'ArrowLeft')  voltarRapido();
+      else if (e.key === 'Delete' || e.key === 'd' || e.key === 'D') descartarRapido();
+      else if (e.key >= '1' && e.key <= '9') {
+        const idx = parseInt(e.key) - 1;
+        if (idx < todosJogadores.length) classificarRapido(todosJogadores[idx]);
+      }
+    });
+  </script>
+</body>
+</html>

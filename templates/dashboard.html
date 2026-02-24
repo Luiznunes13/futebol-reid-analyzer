@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚽ Terça Nobre - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon">⚽</span>
+                <span class="brand-text">Terça Nobre</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('dashboard') }}" class="nav-link active">Dashboard</a></li>
+                <li><a href="{{ url_for('classificar_times') }}" class="nav-link">Classificar</a></li>
+                <li><a href="{{ url_for('elenco') }}" class="nav-link">Elenco</a></li>
+                <li><a href="/captura" class="nav-link">Captura</a></li>
+                <li><a href="/atleta" class="nav-link">Atleta</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <header class="page-header">
+            <h1>🏠 Dashboard</h1>
+            <p class="subtitle">Sistema de Análise de Performance de Jogadores</p>
+        </header>
+
+        <!-- Status do Sistema -->
+        <section class="status-section">
+            <div class="status-card">
+                <div class="status-icon">📸</div>
+                <div class="status-info">
+                    <div class="status-label">Imagens Capturadas</div>
+                    <div class="status-value">{{ total_images }}</div>
+                </div>
+            </div>
+            <div class="status-card">
+                <div class="status-icon">🏷️</div>
+                <div class="status-info">
+                    <div class="status-label">IDs Classificados</div>
+                    <div class="status-value">{{ total_classified }}</div>
+                </div>
+            </div>
+            <div class="status-card">
+                <div class="status-icon">👥</div>
+                <div class="status-info">
+                    <div class="status-label">Jogadores</div>
+                    <div class="status-value">{{ total_players }}</div>
+                </div>
+            </div>
+            <div class="status-card">
+                <div class="status-icon">🤖</div>
+                <div class="status-info">
+                    <div class="status-label">Modelo ReID</div>
+                    <div class="status-value">{{ model_status }}</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ferramentas Principais -->
+        <section class="tools-section">
+            <h2>🛠️ Ferramentas</h2>
+            
+            <div class="tools-grid">
+                <!-- Captura -->
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <span class="tool-icon">📸</span>
+                        <h3>Captura de Imagens</h3>
+                    </div>
+                    <p class="tool-description">
+                        Extrair imagens de jogadores dos vídeos usando YOLO + ByteTrack
+                    </p>
+                    <div class="tool-actions">
+                        <button class="btn btn-primary" onclick="executarScript('script.py')">
+                            Capturar Imagens
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Classificação -->
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <span class="tool-icon">🏷️</span>
+                        <h3>Classificação</h3>
+                    </div>
+                    <p class="tool-description">
+                        Interface web para classificar jogadores manualmente
+                    </p>
+                    <div class="tool-actions">
+                        <a href="{{ url_for('classificar_times') }}" class="btn btn-primary">
+                            Abrir Classificador
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Gerenciar Elenco -->
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <span class="tool-icon">👥</span>
+                        <h3>Gerenciar Elenco</h3>
+                    </div>
+                    <p class="tool-description">
+                        Adicionar, remover e organizar jogadores entre os times
+                    </p>
+                    <div class="tool-actions">
+                        <a href="{{ url_for('elenco') }}" class="btn btn-primary">
+                            Gerenciar Jogadores
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Treinamento ReID -->
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <span class="tool-icon">🤖</span>
+                        <h3>Treinar Modelo ReID</h3>
+                    </div>
+                    <p class="tool-description">
+                        Treinar modelo Deep Learning para reconhecimento automático
+                    </p>
+                    <div class="tool-actions">
+                        <button class="btn btn-secondary" onclick="executarScript('exportar_reid.py')">
+                            1. Exportar Dataset
+                        </button>
+                        <button class="btn btn-primary" onclick="executarScript('treinar_reid_model.py')">
+                            2. Treinar Modelo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Reconhecimento -->
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <span class="tool-icon">🎥</span>
+                        <h3>Processar Vídeos</h3>
+                    </div>
+                    <p class="tool-description">
+                        Reconhecer jogadores automaticamente em novos vídeos
+                    </p>
+                    <div class="tool-actions">
+                        <button class="btn btn-secondary" onclick="executarScript('reconhecer_por_time.py')">
+                            Método Histograma
+                        </button>
+                        <button class="btn btn-primary" onclick="executarScript('reconhecer_com_reid.py')">
+                            Método ReID
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Análise -->
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <span class="tool-icon">📊</span>
+                        <h3>Análise e Relatórios</h3>
+                    </div>
+                    <p class="tool-description">
+                        Calcular distâncias, sincronizar câmeras e estatísticas
+                    </p>
+                    <div class="tool-actions">
+                        <button class="btn btn-secondary" onclick="executarScript('analisar_trajetoria.py')">
+                            Trajetórias
+                        </button>
+                        <button class="btn btn-secondary" onclick="executarScript('sincronizar_cameras.py')">
+                            Sincronizar
+                        </button>
+                        <button class="btn btn-secondary" onclick="executarScript('analisar_balanceamento.py')">
+                            Estatísticas
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Configuração -->
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <span class="tool-icon">⚙️</span>
+                        <h3>Configurações</h3>
+                    </div>
+                    <p class="tool-description">
+                        Configurar times, jogadores e parâmetros do sistema
+                    </p>
+                    <div class="tool-actions">
+                        <button class="btn btn-secondary" onclick="executarScript('setup_times.py')">
+                            Configurar Times
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Documentação -->
+        <section class="docs-section">
+            <h2>📚 Documentação</h2>
+            <div class="docs-grid">
+                <a href="/docs/GUIA_REID.md" class="doc-card" target="_blank">
+                    <span class="doc-icon">📖</span>
+                    <span class="doc-title">Guia ReID</span>
+                </a>
+                <a href="/docs/FERRAMENTAS_AVANCADAS.md" class="doc-card" target="_blank">
+                    <span class="doc-icon">🔧</span>
+                    <span class="doc-title">Ferramentas Avançadas</span>
+                </a>
+                <a href="/docs/MELHORIAS.md" class="doc-card" target="_blank">
+                    <span class="doc-icon">💡</span>
+                    <span class="doc-title">Melhorias Futuras</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Execução -->
+    <div id="executionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Executando Script</h3>
+                <button class="modal-close" onclick="fecharModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="progress-container">
+                    <div class="spinner"></div>
+                    <p id="modalStatus">Aguarde...</p>
+                </div>
+                <div id="modalOutput" class="output-container"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModal()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 Terça Nobre - Sistema de Análise de Futebol</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

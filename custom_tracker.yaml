@@ -1,0 +1,7 @@
+tracker_type: bytetrack
+track_high_thresh: 0.45     # Confiança alta para iniciar rastreamento (reduzido)
+track_low_thresh: 0.1       # Confiança baixa (mantém track se já existe)
+new_track_thresh: 0.5       # Threshold para criar novo track (reduzido)
+track_buffer: 45            # Mantém ID por 45 frames (~1.5s) - mais rápido
+match_thresh: 0.75          # Similaridade para manter mesmo ID (menos rigoroso)
+fuse_score: True            # Combina scores de detecção e IoU
