@@ -62,7 +62,7 @@ class ReIDAccelerado:
 
         core    = ov.Core()
         devices = core.available_devices
-        device  = 'GPU' if 'GPU' in devices else 'CPU'
+        device  = 'CPU'   # GPU desabilitada — evitar travamentos
         print(f'[ACELERADOR] ReID compilando para {device} '
               f'(disponíveis: {devices}) ...', flush=True)
 

@@ -976,7 +976,8 @@ def atleta_extrair_frame():
             return jsonify({'success': False, 'error': f'Frame no timestamp {ts}s não encontrado'}), 400
 
         from ultralytics import YOLO
-        yolo  = YOLO('yolo11n.pt')
+        yolo  = YOLO('yolo11n.pt', verbose=False)
+        yolo.to('cpu')
         h_fr, w_fr = frame.shape[:2]
         results = yolo(frame, classes=[0], verbose=False)[0]
         boxes   = []
@@ -1168,16 +1169,10 @@ def atleta_capturar_refs():
     def _run():
         global _captura_refs_state
         try:
-            try:
-                from scripts.acelerador import get_reid as _get_reid
-                _reid = _get_reid()
-                _emb_fn = lambda _m, crop: _reid.embedding(crop)
-                model_emb = None
-                print(f'[CAPTURA] ReID via OpenVINO {_reid.device}', flush=True)
-            except Exception as _e:
-                print(f'[CAPTURA] Acelerador indisponível ({_e}), usando PyTorch', flush=True)
-                from scripts.analisar_atleta import _build_model, _embedding as _emb_fn
-                model_emb = _build_model()
+            # CPU PyTorch (GPU desabilitada)
+            from scripts.analisar_atleta import _build_model, _embedding as _emb_fn
+            model_emb = _build_model()
+            print('[CAPTURA] ReID via PyTorch CPU', flush=True)
             from ultralytics import YOLO
 
             emb_data = _json.loads(emb_file.read_text())
@@ -1202,7 +1197,8 @@ def atleta_capturar_refs():
             dur_s    = total_fr / fps
             step_fr  = max(1, int(step_s * fps))
 
-            yolo       = YOLO('yolo11n.pt')
+            yolo       = YOLO('yolo11n.pt', verbose=False)
+            yolo.to('cpu')
 
             atleta_dir  = ATLETA_REFS_DIR / nome
             atleta_dir.mkdir(exist_ok=True)
@@ -1393,18 +1389,13 @@ def atleta_testar_rastreamento():
                             'error': f'Frame no timestamp {ts}s não encontrado'}), 400
 
         from ultralytics import YOLO
-        try:
-            from scripts.acelerador import get_reid as _get_reid
-            _reid     = _get_reid()
-            _emb_fn   = lambda _m, crop: _reid.embedding(crop)
-            model_emb = None
-            print(f'[TESTAR] ReID via OpenVINO {_reid.device}', flush=True)
-        except Exception as _e:
-            print(f'[TESTAR] Acelerador indisponível ({_e}), usando PyTorch', flush=True)
-            from scripts.analisar_atleta import _build_model, _embedding as _emb_fn
-            model_emb = _build_model()
+        # CPU PyTorch (GPU desabilitada)
+        from scripts.analisar_atleta import _build_model, _embedding as _emb_fn
+        model_emb = _build_model()
+        print('[TESTAR] ReID via PyTorch CPU', flush=True)
 
-        yolo      = YOLO('yolo11n.pt')
+        yolo      = YOLO('yolo11n.pt', verbose=False)
+        yolo.to('cpu')
         h_fr, w_fr = frame.shape[:2]
         results   = yolo(frame, classes=[0], verbose=False)[0]
 
@@ -1503,6 +1494,7 @@ def atleta_analisar():
         'status': 'iniciando', 'progresso': 0,
         'matches': 0, 'nome': nome,
         'preview_path': preview_path,
+        'threshold': threshold,
     }
 
     def _run():
@@ -1548,6 +1540,8 @@ def atleta_analisar():
                 'matches':      resultado['matches'],
                 'deteccoes':    resultado['deteccoes'],
                 'total_frames': resultado['total_frames'],
+                'incertos':     resultado.get('incertos', []),
+                'threshold_usado': resultado.get('threshold_usado', threshold),
             })
             _salvar_estado_atleta()
         except Exception as e:
@@ -1601,6 +1595,111 @@ def atleta_listar():
                 n_fotos = len(list(d.glob('*.jpg'))) + len(list(d.glob('*.png')))
                 atletas.append({'nome': d.name, 'n_fotos': n_fotos})
     return jsonify({'success': True, 'atletas': atletas})
+
+
+@app.route('/api/atleta/refs/<nome>', methods=['GET'])
+def atleta_refs_listar(nome):
+    """Lista fotos salvas em atleta_refs/{nome}/ com paginação."""
+    from flask import request as _req
+    d = ATLETA_REFS_DIR / nome
+    if not d.exists():
+        return jsonify({'fotos': [], 'total': 0})
+    todas = sorted(
+        p for p in d.iterdir()
+        if p.suffix.lower() in ('.jpg', '.jpeg', '.png')
+    )
+    total = len(todas)
+    page  = int(_req.args.get('page', 1))
+    per   = int(_req.args.get('per', 80))
+    start = (page - 1) * per
+    fotos = [
+        {'nome': p.name, 'url': f'/api/atleta/refs_img/{nome}/{p.name}'}
+        for p in todas[start:start + per]
+    ]
+    return jsonify({'fotos': fotos, 'total': total, 'page': page, 'per': per, 'pages': -(-total // per)})
+
+
+@app.route('/api/atleta/refs_img/<nome>/<path:arquivo>')
+def atleta_refs_img(nome, arquivo):
+    """Serve uma foto de referência diretamente."""
+    return send_from_directory(str(ATLETA_REFS_DIR / nome), arquivo)
+
+
+@app.route('/api/atleta/refs/<nome>/<path:arquivo>', methods=['DELETE'])
+def atleta_refs_deletar(nome, arquivo):
+    """Deleta uma foto de atleta_refs/{nome}/{arquivo}."""
+    p = ATLETA_REFS_DIR / nome / arquivo
+    if p.exists() and p.parent == (ATLETA_REFS_DIR / nome):
+        p.unlink()
+        d = ATLETA_REFS_DIR / nome
+        restantes = len(list(d.glob('*.jpg'))) + len(list(d.glob('*.png')))
+        return jsonify({'ok': True, 'restantes': restantes})
+    return jsonify({'ok': False, 'erro': 'Arquivo não encontrado'}), 404
+
+
+@app.route('/api/atleta/refs/<nome>/qualidade', methods=['GET'])
+def atleta_refs_qualidade(nome):
+    """
+    Analisa qualidade de todas as fotos de um atleta.
+    Usa Laplacian (blur) + Canny (conteúdo) para pontuar cada foto.
+    Retorna só as ruins por padrão (apenas_ruins=1).
+    """
+    from scripts.filtros_classicos import filtrar_pasta
+    from flask import request as _req
+    d = ATLETA_REFS_DIR / nome
+    if not d.exists():
+        return jsonify({'ruins': [], 'total': 0})
+    apenas_ruins = _req.args.get('apenas_ruins', '1') == '1'
+    resultados = filtrar_pasta(d, apenas_ruins=apenas_ruins)
+    # Adiciona URL para cada foto
+    for r in resultados:
+        r['url'] = f'/api/atleta/refs_img/{nome}/{r["arquivo"]}'
+    total_pasta = len([p for p in d.iterdir() if p.suffix.lower() in ('.jpg','.jpeg','.png')])
+    return jsonify({'ruins': resultados, 'total_pasta': total_pasta,
+                    'total_ruins': len(resultados)})
+
+
+@app.route('/api/atleta/refs/<nome>/qualidade/deletar_ruins', methods=['POST'])
+def atleta_refs_deletar_ruins(nome):
+    """Deleta em lote todas as fotos marcadas como ruins pelo filtro clássico."""
+    from scripts.filtros_classicos import filtrar_pasta
+    d = ATLETA_REFS_DIR / nome
+    if not d.exists():
+        return jsonify({'deletadas': 0, 'restantes': 0})
+    ruins = filtrar_pasta(d, apenas_ruins=True)
+    deletadas = 0
+    for r in ruins:
+        p = d / r['arquivo']
+        if p.exists():
+            p.unlink()
+            deletadas += 1
+    restantes = len([p for p in d.iterdir() if p.suffix.lower() in ('.jpg','.jpeg','.png')])
+    return jsonify({'deletadas': deletadas, 'restantes': restantes})
+
+
+
+@app.route('/api/atleta/<nome>/calibrar_threshold', methods=['GET'])
+def atleta_calibrar_threshold(nome):
+    """Curva Precision × Recall para calibração do limiar do atleta."""
+    try:
+        from scripts.analisar_atleta import calibrar_threshold
+        result = calibrar_threshold(nome, ATLETA_REFS_DIR)
+        return jsonify(result)
+    except ValueError as e:
+        return jsonify({'erro': str(e)}), 400
+    except Exception as e:
+        return jsonify({'erro': f'Erro inesperado: {e}'}), 500
+
+
+@app.route('/api/atleta/matriz_confusao', methods=['GET'])
+def atleta_matriz_confusao():
+    """Matriz de similaridade cruzada entre todos os atletas cadastrados."""
+    try:
+        from scripts.analisar_atleta import matriz_confusao_atletas
+        result = matriz_confusao_atletas(ATLETA_REFS_DIR)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'erro': f'Erro: {e}'}), 500
 
 
 # Recuperar candidatos .revisao/ pendentes de sessões anteriores

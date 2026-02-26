@@ -22,7 +22,7 @@ SKIP_FRAMES = 3               # Analisa 1 a cada N frames (velocidade vs precis�
 IMG_SIZE = (256, 128)         # Altura × Largura padrão ReID
 MODEL_NAME = 'osnet_x1_0'    # Modelo padrão (tenta OSNet, fallback ResNet50)
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cpu')   # GPU desabilitada — usar apenas RAM
 
 
 # ─── Modelo ───────────────────────────────────────────────────────
@@ -102,24 +102,21 @@ def analisar_video(video_path: str, ref_embedding: list, state: dict) -> dict:
     """
     Percorre o vídeo, detecta pessoas com YOLO e compara com embedding de referência.
     Atualiza `state` em tempo real com progresso.
-    Retorna dicionário com posições normalizadas (0..1) e estatísticas.
+    Retorna dicionário com posições normalizadas (0..1), estatísticas e incertos.
     """
     from ultralytics import YOLO
 
-    # ReID: preferir OpenVINO GPU, fallback PyTorch
-    try:
-        from scripts.acelerador import get_reid
-        reid     = get_reid()
-        _emb_fn  = lambda _model, crop: reid.embedding(crop)
-        model_emb = None
-        print(f'[ANÁLISE] ReID via OpenVINO {reid.device}', flush=True)
-    except Exception as e:
-        print(f'[AVISO] Acelerador indisponível ({e}), usando PyTorch', flush=True)
-        model_emb = _build_model()
-        _emb_fn   = _embedding
+    # ReID: CPU PyTorch (GPU desabilitada)
+    model_emb = _build_model()
+    _emb_fn   = _embedding
+    print('[ANÁLISE] ReID via PyTorch CPU', flush=True)
 
-    yolo = YOLO('yolo11n.pt')
+    yolo = YOLO('yolo11n.pt', verbose=False)
+    yolo.to('cpu')
     ref_emb = np.array(ref_embedding)
+
+    threshold = state.get('threshold', SIMILARITY_THRESHOLD)
+    near_miss_min = max(0.0, threshold - 0.15)   # zona de incerteza
 
     cap = cv2.VideoCapture(video_path)
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) or 1
@@ -127,10 +124,11 @@ def analisar_video(video_path: str, ref_embedding: list, state: dict) -> dict:
     w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-    posicoes = []       # (x_rel, y_rel) em [0, 1]
-    frame_idx = 0
+    posicoes        = []   # matches acima do threshold
+    incertos        = []   # near-misses (near_miss_min ≤ sim < threshold)
+    frame_idx       = 0
     deteccoes_total = 0
-    matches_total = 0
+    matches_total   = 0
 
     state.update({
         'status': 'rodando', 'progresso': 0,
@@ -171,19 +169,23 @@ def analisar_video(video_path: str, ref_embedding: list, state: dict) -> dict:
             emb = _emb_fn(model_emb, crop)
             sim = float(np.dot(emb, ref_emb))   # cosine (vetores já L2-norm)
 
-            matched = sim >= SIMILARITY_THRESHOLD
+            matched   = sim >= threshold
+            near_miss = (not matched) and (sim >= near_miss_min)
 
             # ── Desenhar caixa no preview ──
             if matched:
-                # Âmbar sólido + label em destaque
                 cv2.rectangle(preview, (x1, y1), (x2, y2), (0, 180, 255), 3)
                 label = f'MATCH  {sim:.2f}'
                 lw, lh = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)[0]
                 cv2.rectangle(preview, (x1, y1 - lh - 10), (x1 + lw + 8, y1), (0, 140, 220), -1)
                 cv2.putText(preview, label, (x1 + 4, y1 - 5),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.65, (255, 255, 255), 2)
+            elif near_miss:
+                # Amarelo + sim score — incerto, próximo do limiar
+                cv2.rectangle(preview, (x1, y1), (x2, y2), (0, 200, 255), 2)
+                cv2.putText(preview, f'? {sim:.2f}', (x1 + 2, y1 - 4),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 200, 255), 1)
             else:
-                # Cinza fino + score pequeno
                 cv2.rectangle(preview, (x1, y1), (x2, y2), (160, 160, 160), 1)
                 cv2.putText(preview, f'{sim:.2f}', (x1 + 2, y1 - 4),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.45, (200, 200, 200), 1)
@@ -196,12 +198,19 @@ def analisar_video(video_path: str, ref_embedding: list, state: dict) -> dict:
                     'y': round(cy, 4),
                     'frame': frame_idx,
                     'ts': round(frame_idx / fps, 2),
+                    'sim': round(sim, 4),
                 })
                 matches_total += 1
                 state['matches'] = matches_total
+            elif near_miss:
+                incertos.append({
+                    'frame': frame_idx,
+                    'ts': round(frame_idx / fps, 2),
+                    'sim': round(sim, 4),
+                })
 
         # HUD no canto superior
-        hud = f'Frame {frame_idx}/{total_frames}  |  Matches: {matches_total}  |  Limiar: {SIMILARITY_THRESHOLD}'
+        hud = f'Frame {frame_idx}/{total_frames}  |  Matches: {matches_total}  |  Limiar: {threshold}'
         cv2.rectangle(preview, (0, 0), (len(hud) * 10 + 16, 30), (0, 0, 0), -1)
         cv2.putText(preview, hud, (8, 20),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 220, 60), 1)
@@ -214,18 +223,180 @@ def analisar_video(video_path: str, ref_embedding: list, state: dict) -> dict:
 
     cap.release()
 
-    # Não setar 'concluido' aqui — app_times.py faz isso após gerar o heatmap
     state.update({'progresso': 99, 'frame': frame_idx})
 
     return {
         'posicoes': posicoes,
+        'incertos': incertos,
         'total_frames': total_frames,
         'fps': fps,
         'video_w': w,
         'video_h': h,
         'matches': matches_total,
         'deteccoes': deteccoes_total,
+        'threshold_usado': threshold,
     }
+
+
+# ─── Calibração de Threshold (Curva Precision × Recall) ──────────
+def calibrar_threshold(nome: str, atleta_refs_dir, n_negativo: int = 200) -> dict:
+    """
+    Computa curva Precision × Recall para o atleta usando:
+    - Positivos: embeddings das fotos de referência do próprio atleta
+    - Negativos: embeddings de OUTROS atletas (ou frames aleatórios)
+
+    Retorna dict com:
+      thresholds, precision, recall, f1, best_threshold, best_f1
+    """
+    from pathlib import Path
+    atleta_refs_dir = Path(atleta_refs_dir)
+
+    # ── Carregar embeddings de referência do atleta (positivos)
+    emb_file = atleta_refs_dir / nome / 'embedding.json'
+    if not emb_file.exists():
+        raise ValueError(f'Embedding não encontrado para {nome}. Gere o embedding primeiro.')
+
+    import json
+    data = json.loads(emb_file.read_text(encoding='utf-8'))
+    ref_emb = np.array(data['embedding'])
+
+    model = _build_model()
+
+    # ── Positivos: similarities das fotos do próprio atleta
+    pasta_pos = atleta_refs_dir / nome
+    fotos_pos = sorted(p for p in pasta_pos.iterdir()
+                       if p.suffix.lower() in ('.jpg', '.jpeg', '.png'))
+    sims_pos = []
+    for p in fotos_pos:
+        img = cv2.imread(str(p))
+        if img is None:
+            continue
+        emb = _embedding(model, img)
+        sims_pos.append(float(np.dot(emb, ref_emb)))
+
+    if len(sims_pos) < 3:
+        raise ValueError('Fotos de referência insuficientes (mínimo 3).')
+
+    # ── Negativos: outras pastas de atletas ou distratores sintéticos
+    sims_neg = []
+    for other_dir in atleta_refs_dir.iterdir():
+        if not other_dir.is_dir() or other_dir.name == nome:
+            continue
+        for p in sorted(other_dir.iterdir())[:50]:
+            if p.suffix.lower() not in ('.jpg', '.jpeg', '.png'):
+                continue
+            img = cv2.imread(str(p))
+            if img is None:
+                continue
+            emb = _embedding(model, img)
+            sims_neg.append(float(np.dot(emb, ref_emb)))
+
+    # Se não houver outros atletas, usar ruído (distratores sintéticos)
+    if len(sims_neg) < 10:
+        rng = np.random.default_rng(42)
+        for _ in range(n_negativo):
+            noise = rng.standard_normal(ref_emb.shape).astype(np.float32)
+            noise /= (np.linalg.norm(noise) + 1e-8)
+            sims_neg.append(float(np.dot(noise, ref_emb)))
+
+    # ── Construir arrays de ground truth e scores
+    scores = np.array(sims_pos + sims_neg)
+    labels = np.array([1] * len(sims_pos) + [0] * len(sims_neg))
+
+    # ── Calcular P/R/F1 para cada threshold
+    thresholds = [round(t, 2) for t in np.arange(0.40, 0.91, 0.02)]
+    precision_list, recall_list, f1_list = [], [], []
+
+    for t in thresholds:
+        pred = (scores >= t).astype(int)
+        tp = int(np.sum((pred == 1) & (labels == 1)))
+        fp = int(np.sum((pred == 1) & (labels == 0)))
+        fn = int(np.sum((pred == 0) & (labels == 1)))
+        p  = tp / (tp + fp + 1e-9)
+        r  = tp / (tp + fn + 1e-9)
+        f1 = 2 * p * r / (p + r + 1e-9)
+        precision_list.append(round(p, 4))
+        recall_list.append(round(r, 4))
+        f1_list.append(round(f1, 4))
+
+    best_idx = int(np.argmax(f1_list))
+    best_t   = thresholds[best_idx]
+    best_f1  = f1_list[best_idx]
+
+    # ── Distribuição de similaridade (histograma)
+    hist_pos, bins = np.histogram(sims_pos, bins=30, range=(0.0, 1.0))
+    hist_neg, _    = np.histogram(sims_neg, bins=30, range=(0.0, 1.0))
+    bin_centres    = [round((bins[i] + bins[i+1]) / 2, 3) for i in range(len(bins)-1)]
+
+    return {
+        'nome': nome,
+        'n_positivos': len(sims_pos),
+        'n_negativos': len(sims_neg),
+        'thresholds': thresholds,
+        'precision': precision_list,
+        'recall': recall_list,
+        'f1': f1_list,
+        'best_threshold': best_t,
+        'best_f1': round(best_f1, 4),
+        'hist_pos': hist_pos.tolist(),
+        'hist_neg': hist_neg.tolist(),
+        'hist_bins': bin_centres,
+        'sim_medio_pos': round(float(np.mean(sims_pos)), 4),
+        'sim_medio_neg': round(float(np.mean(sims_neg)), 4),
+    }
+
+
+# ─── Matriz de Confusão Multi-Atleta ─────────────────────────────
+def matriz_confusao_atletas(atleta_refs_dir) -> dict:
+    """
+    Compara o embedding de cada atleta contra as fotos de todos os outros.
+    Retorna a matriz de similaridade média e lista de atletas.
+    """
+    from pathlib import Path
+    import json
+    atleta_refs_dir = Path(atleta_refs_dir)
+    model = _build_model()
+
+    # ── Carregar embeddings de referência
+    atletas, refs = [], {}
+    for d in sorted(atleta_refs_dir.iterdir()):
+        emb_file = d / 'embedding.json'
+        if not d.is_dir() or not emb_file.exists():
+            continue
+        data = json.loads(emb_file.read_text(encoding='utf-8'))
+        refs[d.name] = np.array(data['embedding'])
+        atletas.append(d.name)
+
+    if len(atletas) < 2:
+        return {'atletas': atletas, 'matrix': [], 'aviso': 'Nenhum par de atletas para comparar.'}
+
+    n = len(atletas)
+    matrix = [[0.0] * n for _ in range(n)]
+
+    # ── Para cada atleta i, calcular sim média das suas fotos contra ref de atleta j
+    for i, nome_i in enumerate(atletas):
+        pasta_i = atleta_refs_dir / nome_i
+        fotos_i = sorted(p for p in pasta_i.iterdir()
+                         if p.suffix.lower() in ('.jpg', '.jpeg', '.png'))[:30]
+        embs_i = []
+        for p in fotos_i:
+            img = cv2.imread(str(p))
+            if img is not None:
+                embs_i.append(_embedding(model, img))
+        if not embs_i:
+            continue
+
+        for j, nome_j in enumerate(atletas):
+            ref_j = refs[nome_j]
+            sims  = [float(np.dot(e, ref_j)) for e in embs_i]
+            matrix[i][j] = round(float(np.mean(sims)), 4)
+
+    return {
+        'atletas': atletas,
+        'matrix': matrix,
+        'n': n,
+    }
+
 
 
 # ─── Zonas do campo ──────────────────────────────────────────────

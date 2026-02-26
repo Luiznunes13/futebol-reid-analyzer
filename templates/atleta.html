@@ -149,6 +149,11 @@
                                 <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
                                 Testar rastreamento
                             </button>
+                            <button class="cv-toolbar-btn" id="btn-ver-fotos-salvas"
+                                    onclick="verFotosSalvas()" style="display:none;">
+                                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/></svg>
+                                <span id="btn-ver-fotos-label">Ver fotos salvas</span>
+                            </button>
                         </div>
                         <div id="revisao-counter-top" style="font-size:13px;color:var(--text-muted);padding:0 16px;align-self:center;"></div>
                     </div>
@@ -275,6 +280,84 @@
                         </div>
                     </div>
 
+                    <!-- ── FOTOS SALVAS DO ATLETA ── -->
+                    <div id="fotos-salvas-section" style="display:none;height:100%;flex-direction:column;">
+
+                        <!-- Toolbar galeria salvas -->
+                        <div class="gallery-toolbar">
+                            <div class="gallery-toolbar-left">
+                                <span style="font-size:13px;font-weight:600;">Fotos de referência salvas</span>
+                                <div class="gallery-sep"></div>
+                                <span id="fotos-salvas-counter" style="font-size:12.5px;color:var(--text-muted);">0 fotos</span>
+                            </div>
+                            <div class="gallery-toolbar-right">
+                                <button class="cv-toolbar-btn" id="btn-filtro-auto"
+                                        onclick="filtrarBorradasAuto()">
+                                    🔍 Filtrar borradas
+                                </button>
+                                <button class="cv-toolbar-btn cv-toolbar-btn--accent"
+                                        onclick="iniciarClassificacaoRapida()">
+                                    ⚡ Classificação rápida
+                                </button>
+                                <button class="cv-toolbar-btn cv-toolbar-btn--danger"
+                                        onclick="fecharFotosSalvas()">
+                                    ✕ Fechar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Grade das fotos salvas -->
+                        <div class="gallery-grid-wrap" style="flex:1;">
+                            <div id="fotos-salvas-grid" class="gallery-grid"></div>
+                        </div>
+
+                    </div>
+
+                    <!-- ── CLASSIFICAÇÃO RÁPIDA ── -->
+                    <div id="classif-rapida-section" style="display:none;height:100%;flex-direction:column;">
+
+                        <!-- Toolbar classificação -->
+                        <div class="gallery-toolbar">
+                            <div class="gallery-toolbar-left">
+                                <span style="font-size:13px;font-weight:600;" id="classif-titulo">Classificação rápida</span>
+                                <div class="gallery-sep"></div>
+                                <span id="classif-progresso" style="font-size:12.5px;color:var(--text-muted);">0 / 0</span>
+                                <div class="gallery-sep"></div>
+                                <span id="classif-stats" style="font-size:12px;color:var(--text-muted);">✓ 0 &nbsp; ✗ 0</span>
+                            </div>
+                            <div class="gallery-toolbar-right">
+                                <button class="cv-toolbar-btn" onclick="_classifSair()">← Voltar ao grid</button>
+                            </div>
+                        </div>
+
+                        <!-- Barra de progresso -->
+                        <div style="height:3px;background:var(--border);">
+                            <div id="classif-barra" style="height:3px;background:var(--accent);width:0%;transition:width .2s;"></div>
+                        </div>
+
+                        <!-- Imagem central -->
+                        <div class="classif-stage">
+                            <div class="classif-img-wrap">
+                                <img id="classif-img" src="" alt="">
+                                <img id="classif-img-preload" src="" alt="" style="display:none;">
+                            </div>
+                            <div id="classif-nome" class="classif-nome"></div>
+                            <div class="classif-btns">
+                                <button class="classif-btn classif-btn--del" onclick="_classifDeletar()">
+                                    <span class="classif-btn-icon">✗</span>
+                                    <span class="classif-btn-label">Deletar</span>
+                                    <span class="classif-btn-key">← Del</span>
+                                </button>
+                                <button class="classif-btn classif-btn--ok" onclick="_classifManter()">
+                                    <span class="classif-btn-icon">✓</span>
+                                    <span class="classif-btn-label">Manter</span>
+                                    <span class="classif-btn-key">→ Space</span>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
                     <!-- Estado ocioso da tab de fotos -->
                     <div id="fotos-idle" class="tab-idle">
                         <div class="idle-icon">📷</div>
@@ -394,8 +477,66 @@
                             <div class="heatmap-actions">
                                 <a id="btn-baixar" class="btn btn-secondary" download>⬇ Baixar PNG</a>
                                 <a id="btn-baixar-csv" class="btn btn-secondary" download style="display:none;">📊 Exportar CSV</a>
-                                <button class="btn btn-outline" id="btn-nova-analise">Nova análise</button>
+                                <button class="btn btn-outline" id="btn-nova-analise">Nova análise</button>                                <button class="btn btn-outline" onclick="calibrarThreshold()" id="btn-calibrar-limiar">📈 Calibrar limiar</button>
+                                <button class="btn btn-outline" onclick="mostrarMatrizConfusao()" id="btn-matriz-confusao">🔀 Matriz de confusão</button>
                             </div>
+
+                            <!-- ─ Painel Calibração ─ -->
+                            <div id="calibrar-painel" class="hidden" style="margin-top:24px;background:var(--surface-2);border-radius:12px;padding:20px;border:1px solid var(--border);">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                                    <h4 style="margin:0;font-size:15px;">📈 Curva Precisão × Recall</h4>
+                                    <button onclick="document.getElementById('calibrar-painel').classList.add('hidden')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;">×</button>
+                                </div>
+                                <div id="calibrar-loading" style="text-align:center;padding:32px;color:var(--text-muted);">Calculando… (pode levar alguns segundos)</div>
+                                <div id="calibrar-resultado" class="hidden">
+                                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
+                                        <div style="background:var(--surface);border-radius:8px;padding:12px;text-align:center;">
+                                            <div style="font-size:22px;font-weight:700;color:#22c55e;" id="cal-best-t">-</div>
+                                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Threshold ótimo (F1)</div>
+                                        </div>
+                                        <div style="background:var(--surface);border-radius:8px;padding:12px;text-align:center;">
+                                            <div style="font-size:22px;font-weight:700;" id="cal-best-f1">-</div>
+                                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Melhor F1-score</div>
+                                        </div>
+                                        <div style="background:var(--surface);border-radius:8px;padding:12px;text-align:center;">
+                                            <div style="font-size:22px;font-weight:700;" id="cal-n-pos">-</div>
+                                            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Fotos positivas</div>
+                                        </div>
+                                    </div>
+                                    <div style="overflow-x:auto;">
+                                        <table id="cal-tabela" style="width:100%;border-collapse:collapse;font-size:12px;">
+                                            <thead>
+                                                <tr style="color:var(--text-muted);">
+                                                    <th style="padding:6px 10px;text-align:left;">Threshold</th>
+                                                    <th style="padding:6px 10px;text-align:right;">Precision</th>
+                                                    <th style="padding:6px 10px;text-align:right;">Recall</th>
+                                                    <th style="padding:6px 10px;text-align:right;">F1-score</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="cal-tabela-body"></tbody>
+                                        </table>
+                                    </div>
+                                    <p id="cal-aviso-neg" class="hidden" style="margin-top:12px;font-size:12px;color:var(--text-muted);padding:8px;background:rgba(234,179,8,.1);border-radius:6px;">
+                                        ⚠️ Sem outros atletas cadastrados — negativos sintéticos usados.
+                                        Para resultados mais precisos, adicione outros atletas ao sistema.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- ─ Painel Matriz de Confusão ─ -->
+                            <div id="matriz-painel" class="hidden" style="margin-top:24px;background:var(--surface-2);border-radius:12px;padding:20px;border:1px solid var(--border);">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                                    <h4 style="margin:0;font-size:15px;">🔀 Matriz de Similaridade entre Atletas</h4>
+                                    <button onclick="document.getElementById('matriz-painel').classList.add('hidden')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;">×</button>
+                                </div>
+                                <div id="matriz-loading" style="text-align:center;padding:32px;color:var(--text-muted);">Calculando…</div>
+                                <div id="matriz-resultado" class="hidden">
+                                    <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">
+                                        Cada célula mostra a similaridade coseno média das fotos do atleta da linha contra o embedding do atleta da coluna.<br>
+                                        Diagonal = auto-similaridade (≈ maior). Valores altos fora da diagonal indicam atletas visuais similares.
+                                    </p>
+                                    <div id="matriz-tabela-wrap" style="overflow-x:auto;"></div>
+                                </div>                            </div>
                         </div>
 
                         <!-- Estado ocioso -->

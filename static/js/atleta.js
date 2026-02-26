@@ -11,6 +11,7 @@ function mudarTab(btn) {
 let fotosFiles   = [];
 let pollingTimer = null;
 let ytUrlAtleta  = null;   // URL do YouTube selecionada
+let _nomeInputTimer = null;
 
 // ─── Utils ────────────────────────────────────────────────────────
 function toast(msg, tipo = '') {
@@ -118,7 +119,23 @@ function renderPreview() {
 
 function validarBotaoEmbed() {
   const nome = document.getElementById('nome-atleta').value.trim();
-  document.getElementById('btn-gerar-embedding').disabled = !(nome && fotosFiles.length >= 1);
+  const temFotosLocal    = fotosFiles.length >= 1;
+  const temFotosServidor = _fotosSalvasTotal > 0;
+  const btn = document.getElementById('btn-gerar-embedding');
+  btn.disabled = !nome;
+  if (nome && !temFotosLocal && !temFotosServidor) {
+    btn.textContent = 'Gerar Embedding';
+    btn.title = 'Nenhuma foto ainda. Envie fotos ou use o extrator.';
+  } else if (nome && !temFotosLocal && temFotosServidor) {
+    btn.textContent = `Gerar Embedding (${_fotosSalvasTotal} fotos salvas)`;
+    btn.title = `Usar as ${_fotosSalvasTotal} fotos já salvas em atleta_refs/${nome}`;
+  } else if (nome && temFotosLocal) {
+    btn.textContent = `Gerar Embedding (${fotosFiles.length} foto${fotosFiles.length > 1 ? 's' : ''})`;
+    btn.title = '';
+  } else {
+    btn.textContent = 'Gerar Embedding';
+    btn.title = '';
+  }
 }
 
 // ─── Threshold slider ─────────────────────────────────────────────
@@ -131,7 +148,20 @@ function setupThreshold() {
 
 // ─── Botões ───────────────────────────────────────────────────────
 function setupBotoes() {
-  document.getElementById('nome-atleta').addEventListener('input', validarBotaoEmbed);
+  document.getElementById('nome-atleta').addEventListener('input', () => {
+    validarBotaoEmbed();
+    const nome = document.getElementById('nome-atleta').value.trim();
+    if (!nome) { _atualizarBotaoFotosSalvas('', 0); return; }
+    // Busca contagem real no servidor (debounced)
+    clearTimeout(_nomeInputTimer);
+    _nomeInputTimer = setTimeout(async () => {
+      try {
+        const r = await fetch(`/api/atleta/refs/${encodeURIComponent(nome)}?page=1&per=1`);
+        const d = await r.json();
+        _atualizarBotaoFotosSalvas(nome, d.total || 0);
+      } catch { _atualizarBotaoFotosSalvas(nome, -1); }
+    }, 400);
+  });
   document.getElementById('btn-gerar-embedding').addEventListener('click', gerarEmbedding);
   document.getElementById('btn-analisar').addEventListener('click', iniciarAnalise);
   document.getElementById('btn-nova-analise').addEventListener('click', resetUI);
@@ -264,6 +294,7 @@ async function carregarAtletas() {
           document.querySelectorAll('.atleta-chip').forEach(c => c.classList.remove('selecionado'));
           chip.classList.add('selecionado');
           select.value = a.nome;
+          _atualizarBotaoFotosSalvas(a.nome, a.n_fotos);
         });
         lista.appendChild(chip);
 
@@ -461,6 +492,52 @@ function mostrarResultado(data) {
       if (span) span.textContent = pct > 0 ? `${pct}%` : '-';
       cell.classList.toggle('ativa', pct > 0 && pct === maxPct);
     });
+  }
+
+  // ── Detecções incertas (near-miss log) ──
+  const incertos = data.incertos || [];
+  let incBox = document.getElementById('incertos-box');
+  if (incertos.length > 0) {
+    if (!incBox) {
+      incBox = document.createElement('div');
+      incBox.id = 'incertos-box';
+      incBox.style.cssText = 'margin-top:16px;background:rgba(234,179,8,.1);border:1px solid rgba(234,179,8,.35);border-radius:8px;padding:14px;';
+      document.getElementById('zonas-wrap').after(incBox);
+    }
+    const threshold = data.threshold_usado || 0.65;
+    const minSim    = (incertos.reduce((a, b) => Math.min(a, b.sim), 1)).toFixed(3);
+    const maxSim    = (incertos.reduce((a, b) => Math.max(a, b.sim), 0)).toFixed(3);
+    incBox.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:13px;font-weight:600;color:#facc15;">⚠️ ${incertos.length} detecções incertas</span>
+        <span style="font-size:11px;color:var(--text-muted);">sim ∈ [${minSim}, ${maxSim}] | limiar ${threshold}</span>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">
+        Foram detectadas pessoas com similaridade próxima (mas abaixo) do limiar.
+        Considere <strong>calibrar o limiar</strong> se o atleta estiver sendo perdido.
+      </p>
+      <details>
+        <summary style="font-size:12px;cursor:pointer;color:var(--text-muted);">Ver log detalhado (${incertos.length} entradas)</summary>
+        <div style="max-height:140px;overflow-y:auto;margin-top:8px;">
+          <table style="width:100%;font-size:11px;border-collapse:collapse;">
+            <thead><tr style="color:var(--text-muted);">
+              <th style="padding:4px 8px;text-align:left;">Tempo (s)</th>
+              <th style="padding:4px 8px;text-align:right;">Frame</th>
+              <th style="padding:4px 8px;text-align:right;">Similaridade</th>
+            </tr></thead>
+            <tbody>${incertos.slice(0, 100).map(ic =>
+              `<tr style="border-top:1px solid var(--border);">
+                <td style="padding:3px 8px;">${ic.ts}s</td>
+                <td style="padding:3px 8px;text-align:right;">${ic.frame}</td>
+                <td style="padding:3px 8px;text-align:right;color:#facc15;">${ic.sim}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </details>`;
+    incBox.style.display = 'block';
+  } else if (incBox) {
+    incBox.style.display = 'none';
   }
 
   toast('Análise concluída!', 'success');
@@ -1016,5 +1093,470 @@ async function salvarCrop(boxScaled) {
   } catch (e) {
     st.textContent = '❌ ' + e.message;
     toast('Erro: ' + e.message, 'error');
+  }
+}
+
+// ─── FOTOS SALVAS DO ATLETA ──────────────────────────────────────
+let _fotosSalvasAtleta = null;
+
+function _atualizarBotaoFotosSalvas(nome, nFotos) {
+  const btn   = document.getElementById('btn-ver-fotos-salvas');
+  const label = document.getElementById('btn-ver-fotos-label');
+  if (!btn) return;
+  if (nome) {
+    btn.style.display = '';
+    _fotosSalvasAtleta = nome;
+    if (nFotos > 0) {
+      _fotosSalvasTotal = nFotos;
+      label.textContent = `Ver ${nFotos} foto${nFotos !== 1 ? 's' : ''} salvas`;
+    } else {
+      // nFotos === -1 significa "não contado ainda"
+      if (nFotos === 0) _fotosSalvasTotal = 0;
+      label.textContent = 'Ver fotos salvas';
+    }
+  } else {
+    btn.style.display = 'none';
+    _fotosSalvasAtleta = null;
+    _fotosSalvasTotal  = 0;
+  }
+  validarBotaoEmbed();
+}
+
+let _fotosSalvasPage = 1;
+let _fotosSalvasTotal = 0;
+let _fotosSalvasNome  = '';
+
+async function verFotosSalvas() {
+  const nome = _fotosSalvasAtleta ||
+               document.getElementById('nome-atleta').value.trim();
+  if (!nome) { toast('Selecione ou nomeie um atleta primeiro', 'error'); return; }
+
+  _fotosSalvasNome  = nome;
+  _fotosSalvasPage  = 1;
+
+  // Esconder idle e revisao, mostrar fotos-salvas
+  document.getElementById('fotos-idle').classList.add('hidden');
+  document.getElementById('captura-refs-revisao').style.display = 'none';
+  const sec = document.getElementById('fotos-salvas-section');
+  sec.style.display = 'flex';
+
+  const grid = document.getElementById('fotos-salvas-grid');
+  grid.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">Carregando…</div>';
+
+  await _carregarPaginaFotos(nome, 1, true);
+}
+
+async function _carregarPaginaFotos(nome, page, reset) {
+  const grid = document.getElementById('fotos-salvas-grid');
+  try {
+    const res  = await fetch(`/api/atleta/refs/${encodeURIComponent(nome)}?page=${page}&per=80`);
+    const data = await res.json();
+
+    _fotosSalvasTotal = data.total;
+    if (reset) grid.innerHTML = '';
+    else {
+      const loadMore = grid.querySelector('.load-more-btn');
+      if (loadMore) loadMore.remove();
+    }
+
+    document.getElementById('fotos-salvas-counter').textContent =
+      `${data.total} foto${data.total !== 1 ? 's' : ''}`;
+
+    if (data.total === 0) {
+      grid.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">Nenhuma foto salva ainda.</div>';
+      return;
+    }
+
+    data.fotos.forEach(f => {
+      const item = document.createElement('div');
+      item.className = 'gallery-item';
+      item.dataset.nome = f.nome;
+      item.innerHTML = `
+        <img src="${f.url}" alt="${f.nome}" loading="lazy">
+        <div class="gallery-item-label">${f.nome.substring(0, 18)}</div>
+        <div class="gallery-item-del" title="Deletar foto"
+             onclick="deletarFotoSalva('${nome}','${f.nome}',this.parentElement)">
+          ×
+        </div>`;
+      grid.appendChild(item);
+    });
+
+    // Botão "carregar mais" se houver mais páginas
+    const loaded = page * data.per;
+    if (loaded < data.total) {
+      const btn = document.createElement('div');
+      btn.className = 'load-more-btn';
+      btn.style.cssText = 'width:100%;text-align:center;padding:12px;cursor:pointer;color:var(--accent);font-size:13px;font-weight:600;';
+      btn.textContent = `Carregar mais (${data.total - loaded} restantes…)`;
+      btn.onclick = () => {
+        _fotosSalvasPage++;
+        _carregarPaginaFotos(_fotosSalvasNome, _fotosSalvasPage, false);
+      };
+      grid.appendChild(btn);
+    }
+
+  } catch (e) {
+    grid.innerHTML = `<div style="color:#dc2626;font-size:13px;">❌ ${e.message}</div>`;
+  }
+}
+
+async function deletarFotoSalva(nome, arquivo, el) {
+  if (!confirm(`Deletar "${arquivo}"?`)) return;
+  el.classList.add('deletando');
+  try {
+    const res  = await fetch(
+      `/api/atleta/refs/${encodeURIComponent(nome)}/${encodeURIComponent(arquivo)}`,
+      { method: 'DELETE' }
+    );
+    const data = await res.json();
+    if (data.ok) {
+      el.remove();
+      document.getElementById('fotos-salvas-counter').textContent =
+        `${data.restantes} foto${data.restantes !== 1 ? 's' : ''}`;
+      _atualizarBotaoFotosSalvas(nome, data.restantes);
+      toast('Foto deletada', 'success');
+    } else {
+      el.classList.remove('deletando');
+      toast('Erro ao deletar: ' + data.erro, 'error');
+    }
+  } catch (e) {
+    el.classList.remove('deletando');
+    toast('Erro: ' + e.message, 'error');
+  }
+}
+
+function fecharFotosSalvas() {
+  document.getElementById('fotos-salvas-section').style.display = 'none';
+  document.getElementById('classif-rapida-section').style.display = 'none';
+  const revisaoAberta  = document.getElementById('captura-refs-revisao').style.display !== 'none';
+  const extratorAberto = document.getElementById('extrator-section').style.display !== 'none';
+  if (!revisaoAberta && !extratorAberto) {
+    document.getElementById('fotos-idle').classList.remove('hidden');
+  }
+}
+
+// ─── FILTRO AUTO (Laplacian + Canny) ───────────────────────────────
+
+async function filtrarBorradasAuto() {
+  const nome = _fotosSalvasNome || _fotosSalvasAtleta ||
+               document.getElementById('nome-atleta').value.trim();
+  if (!nome) { toast('Selecione um atleta primeiro', 'error'); return; }
+
+  const btn = document.getElementById('btn-filtro-auto');
+  btn.disabled = true;
+  btn.textContent = '🔄 Analisando…';
+
+  try {
+    const res  = await fetch(`/api/atleta/refs/${encodeURIComponent(nome)}/qualidade`);
+    const data = await res.json();
+    const ruins = data.ruins || [];
+
+    btn.disabled = false;
+    btn.textContent = '🔍 Filtrar borradas';
+
+    if (ruins.length === 0) {
+      toast(`✅ Todas as ${data.total_pasta} fotos passaram no filtro de qualidade!`, 'success');
+      return;
+    }
+
+    // Marca fotos ruins com overlay vermelho no grid atual
+    const grid = document.getElementById('fotos-salvas-grid');
+    let marcadas = 0;
+    ruins.forEach(r => {
+      const item = [...grid.querySelectorAll('.gallery-item')]
+        .find(el => el.dataset.nome === r.arquivo);
+      if (item) {
+        item.style.outline = '2px solid #dc2626';
+        item.title = `Baixa qualidade: ${r.motivo} (score ${r.score})`;
+        marcadas++;
+      }
+    });
+
+    const confirmar = confirm(
+      `🔍 Filtro clássico (Laplacian + Canny) encontrou:\n\n` +
+      `  • ${ruins.length} fotos com baixa qualidade (de ${data.total_pasta} total)\n` +
+      `  • ${marcadas} visíveis no grid atual\n\n` +
+      `Motivos mais comuns:\n` +
+      [...new Set(ruins.slice(0,5).map(r => '  • ' + r.motivo))].join('\n') +
+      `\n\nDeletar todas as fotos de baixa qualidade?`
+    );
+
+    if (!confirmar) return;
+
+    const res2  = await fetch(
+      `/api/atleta/refs/${encodeURIComponent(nome)}/qualidade/deletar_ruins`,
+      { method: 'POST' }
+    );
+    const data2 = await res2.json();
+    toast(`🗑️ ${data2.deletadas} fotos ruins deletadas. Restam ${data2.restantes}.`, 'success');
+    _atualizarBotaoFotosSalvas(nome, data2.restantes);
+    await verFotosSalvas();  // Recarrega grid
+
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '🔍 Filtrar borradas';
+    toast('Erro no filtro: ' + e.message, 'error');
+  }
+}
+
+// ─── CLASSIFICAÇÃO RÁPIDA ────────────────────────────────────────
+const _cr = {
+  fotos: [], index: 0, page: 1, pages: 1,
+  nome: '', mantidas: 0, deletadas: 0,
+  busy: false
+};
+
+async function iniciarClassificacaoRapida() {
+  const nome = _fotosSalvasNome || _fotosSalvasAtleta ||
+               document.getElementById('nome-atleta').value.trim();
+  if (!nome) { toast('Nenhum atleta selecionado', 'error'); return; }
+
+  _cr.fotos = []; _cr.index = 0; _cr.page = 1; _cr.pages = 1;
+  _cr.nome = nome; _cr.mantidas = 0; _cr.deletadas = 0; _cr.busy = false;
+
+  document.getElementById('fotos-salvas-section').style.display  = 'none';
+  document.getElementById('classif-rapida-section').style.display = 'flex';
+  document.getElementById('classif-titulo').textContent = `⚡ ${nome}`;
+  document.getElementById('classif-img').src = '';
+  document.getElementById('classif-nome').textContent = 'Carregando…';
+
+  await _crCarregarPagina(1);
+  _crMostrar();
+}
+
+async function _crCarregarPagina(page) {
+  const res  = await fetch(`/api/atleta/refs/${encodeURIComponent(_cr.nome)}?page=${page}&per=80`);
+  const data = await res.json();
+  _cr.pages = data.pages;
+  data.fotos.forEach(f => _cr.fotos.push(f));
+}
+
+function _crMostrar() {
+  if (_cr.fotos.length === 0) {
+    document.getElementById('classif-nome').textContent = 'Nenhuma foto encontrada.';
+    return;
+  }
+  const f    = _cr.fotos[_cr.index];
+  const img  = document.getElementById('classif-img');
+  img.className = '';
+  img.src = f.url;
+  document.getElementById('classif-nome').textContent = f.nome;
+
+  const total = _cr.fotos.length;
+  const pos   = _cr.index + 1;
+  document.getElementById('classif-progresso').textContent = `${pos} / ${total}`;
+  document.getElementById('classif-stats').textContent = `✓ ${_cr.mantidas}   ✗ ${_cr.deletadas}`;
+  document.getElementById('classif-barra').style.width = `${Math.round(pos / total * 100)}%`;
+
+  // Pré-carregar próxima
+  if (_cr.index + 1 < _cr.fotos.length) {
+    document.getElementById('classif-img-preload').src = _cr.fotos[_cr.index + 1].url;
+  }
+
+  // Carregar próxima página antecipadamente
+  const loadedPages = Math.ceil(_cr.fotos.length / 80);
+  if (_cr.index >= _cr.fotos.length - 20 && loadedPages < _cr.pages) {
+    _crCarregarPagina(loadedPages + 1);
+  }
+}
+
+async function _classifManter() {
+  if (_cr.busy || _cr.fotos.length === 0) return;
+  const img = document.getElementById('classif-img');
+  img.className = 'ok';
+  _cr.mantidas++;
+  _crAvancar();
+}
+
+async function _classifDeletar() {
+  if (_cr.busy || _cr.fotos.length === 0) return;
+  _cr.busy = true;
+  const img = document.getElementById('classif-img');
+  img.className = 'del';
+  const f   = _cr.fotos[_cr.index];
+  try {
+    await fetch(
+      `/api/atleta/refs/${encodeURIComponent(_cr.nome)}/${encodeURIComponent(f.nome)}`,
+      { method: 'DELETE' }
+    );
+  } catch(e) { /* silencioso */ }
+  _cr.fotos.splice(_cr.index, 1);
+  _cr.deletadas++;
+  _cr.busy = false;
+  if (_cr.index >= _cr.fotos.length) _cr.index = Math.max(0, _cr.fotos.length - 1);
+  if (_cr.fotos.length === 0) {
+    document.getElementById('classif-nome').textContent = '✅ Todas as fotos revisadas!';
+    document.getElementById('classif-img').src = '';
+    document.getElementById('classif-barra').style.width = '100%';
+    document.getElementById('classif-progresso').textContent = `0 restantes`;
+    document.getElementById('classif-stats').textContent = `✓ ${_cr.mantidas}   ✗ ${_cr.deletadas}`;
+    _atualizarBotaoFotosSalvas(_cr.nome, 0);
+    return;
+  }
+  _crMostrar();
+}
+
+function _crAvancar() {
+  _cr.index++;
+  if (_cr.index >= _cr.fotos.length) {
+    document.getElementById('classif-nome').textContent = '✅ Classificação concluída!';
+    document.getElementById('classif-img').src = '';
+    document.getElementById('classif-barra').style.width = '100%';
+    document.getElementById('classif-progresso').textContent = 'Concluído';
+    document.getElementById('classif-stats').textContent = `✓ ${_cr.mantidas}   ✗ ${_cr.deletadas}`;
+    _atualizarBotaoFotosSalvas(_cr.nome, _cr.fotos.length);
+    return;
+  }
+  _crMostrar();
+}
+
+function _classifSair() {
+  document.getElementById('classif-rapida-section').style.display = 'none';
+  verFotosSalvas();
+}
+
+// Atalhos de teclado para classificação rápida
+document.addEventListener('keydown', e => {
+  const sec = document.getElementById('classif-rapida-section');
+  if (!sec || sec.style.display === 'none') return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); _classifManter(); }
+  if (e.key === 'ArrowLeft'  || e.key === 'Delete') { e.preventDefault(); _classifDeletar(); }
+});
+
+// ─── CALIBRAÇÃO DE THRESHOLD ───────────────────────────────────────
+async function calibrarThreshold() {
+  const nome = document.getElementById('nome-atleta').value.trim();
+  if (!nome) { toast('Informe o nome do atleta primeiro', 'error'); return; }
+
+  const painel = document.getElementById('calibrar-painel');
+  const loading = document.getElementById('calibrar-loading');
+  const resultado = document.getElementById('calibrar-resultado');
+  const btn = document.getElementById('btn-calibrar-limiar');
+
+  painel.classList.remove('hidden');
+  loading.style.display = 'block';
+  resultado.classList.add('hidden');
+  btn.disabled = true;
+  btn.textContent = '🔄 Calculando…';
+  painel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  try {
+    const res  = await fetch(`/api/atleta/${encodeURIComponent(nome)}/calibrar_threshold`);
+    const data = await res.json();
+    if (data.erro) { toast(data.erro, 'error'); loading.style.display = 'none'; return; }
+
+    // ─ stats principais
+    document.getElementById('cal-best-t').textContent = data.best_threshold.toFixed(2);
+    document.getElementById('cal-best-f1').textContent = (data.best_f1 * 100).toFixed(1) + '%';
+    document.getElementById('cal-n-pos').textContent   = data.n_positivos;
+
+    // ─ aviso se sem negativos reais
+    const avisoNeg = document.getElementById('cal-aviso-neg');
+    if (data.n_negativos < 20) { avisoNeg.classList.remove('hidden'); }
+    else                       { avisoNeg.classList.add('hidden'); }
+
+    // ─ tabela P/R/F1
+    const tbody = document.getElementById('cal-tabela-body');
+    tbody.innerHTML = '';
+    const currentThreshold = parseFloat(
+      (document.getElementById('threshold-slider') || {}).value || 0.65
+    );
+
+    data.thresholds.forEach((t, i) => {
+      const isBest    = t === data.best_threshold;
+      const isCurrent = Math.abs(t - currentThreshold) < 0.015;
+      const bg = isBest ? 'background:rgba(34,197,94,.15);font-weight:700;'
+               : isCurrent ? 'background:rgba(250,204,21,.12);'
+               : '';
+      tbody.innerHTML += `
+        <tr style="border-top:1px solid var(--border);${bg}">
+          <td style="padding:6px 10px;">
+            ${t.toFixed(2)}
+            ${isBest    ? ' <span style="color:#22c55e;font-size:11px;">&#x2605; melhor</span>' : ''}
+            ${isCurrent ? ' <span style="color:#facc15;font-size:11px;">(atual)</span>' : ''}
+          </td>
+          <td style="padding:6px 10px;text-align:right;">${(data.precision[i]*100).toFixed(1)}%</td>
+          <td style="padding:6px 10px;text-align:right;">${(data.recall[i]*100).toFixed(1)}%</td>
+          <td style="padding:6px 10px;text-align:right;">${(data.f1[i]*100).toFixed(1)}%</td>
+        </tr>`;
+    });
+
+    loading.style.display = 'none';
+    resultado.classList.remove('hidden');
+    toast(`📈 Threshold ótimo: ${data.best_threshold.toFixed(2)} (F1=${(data.best_f1*100).toFixed(1)}%)`, 'success');
+
+  } catch(e) {
+    toast('Erro ao calibrar: ' + e.message, 'error');
+    loading.style.display = 'none';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '📈 Calibrar limiar';
+  }
+}
+
+
+// ─── MATRIZ DE CONFUSÃO ───────────────────────────────────────────
+async function mostrarMatrizConfusao() {
+  const painel  = document.getElementById('matriz-painel');
+  const loading = document.getElementById('matriz-loading');
+  const resultado = document.getElementById('matriz-resultado');
+  const btn     = document.getElementById('btn-matriz-confusao');
+
+  painel.classList.remove('hidden');
+  loading.style.display = 'block';
+  resultado.classList.add('hidden');
+  btn.disabled = true;
+  btn.textContent = '🔄 Calculando…';
+  painel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  try {
+    const res  = await fetch('/api/atleta/matriz_confusao');
+    const data = await res.json();
+    if (data.erro) { toast(data.erro, 'error'); loading.style.display = 'none'; return; }
+    if (data.aviso) { toast(data.aviso, 'info'); loading.style.display = 'none'; return; }
+
+    const { atletas, matrix } = data;
+    const n = atletas.length;
+
+    // Construir tabela HTML
+    let html = '<table style="border-collapse:collapse;font-size:12px;width:100%;">';
+
+    // cabeçalho
+    html += '<thead><tr><th style="padding:6px 10px;text-align:left;"></th>';
+    atletas.forEach(a => {
+      html += `<th style="padding:6px 10px;text-align:center;color:var(--text-muted);white-space:nowrap;">${a}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+
+    // linhas
+    matrix.forEach((row, i) => {
+      html += `<tr><td style="padding:6px 10px;font-weight:600;white-space:nowrap;">${atletas[i]}</td>`;
+      row.forEach((val, j) => {
+        const isDiag  = i === j;
+        const isHigh  = !isDiag && val >= 0.50;
+        const pct     = (val * 100).toFixed(1);
+        // mapeamento de cor: diagonal = verde, alto fora da diagonal = laranja, normal = escala cinza
+        let bg, color;
+        if (isDiag)  { bg = `rgba(34,197,94,${Math.min(val, 0.9)})`;   color = '#fff'; }
+        else if (isHigh) { bg = `rgba(249,115,22,${val * 0.7})`;        color = '#fff'; }
+        else         { bg = `rgba(100,116,139,${val * 0.5})`;           color = 'var(--text-muted)'; }
+        html += `<td style="padding:8px 10px;text-align:center;background:${bg};color:${color};border:1px solid var(--border);">${pct}%</td>`;
+      });
+      html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    document.getElementById('matriz-tabela-wrap').innerHTML = html;
+
+    loading.style.display = 'none';
+    resultado.classList.remove('hidden');
+    toast(`🔀 Matriz calculada para ${n} atleta${n !== 1 ? 's' : ''}`, 'success');
+
+  } catch(e) {
+    toast('Erro ao calcular matriz: ' + e.message, 'error');
+    loading.style.display = 'none';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔀 Matriz de confusão';
   }
 }
